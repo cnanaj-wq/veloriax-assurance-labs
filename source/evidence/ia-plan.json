@@ -1,0 +1,155 @@
+{
+ "date_reference": "2026-10-28",
+ "horizon": [
+  "2026-11",
+  "2026-12",
+  "2027-01"
+ ],
+ "tirages": 5000,
+ "primes_projetees": [
+  1000000.0,
+  1000000.0,
+  1060000.0
+ ],
+ "croissance_nb_sinistres": 0.966,
+ "sp_trimestre_sans_action": [
+  0.6986,
+  0.7337,
+  0.7711
+ ],
+ "sp_trimestre_avec_plan": [
+  0.6885,
+  0.7241,
+  0.7627
+ ],
+ "gain_points_sp_median": 0.96,
+ "probabilite_plan_meilleur": 0.939,
+ "probabilite_sous_cible_sans": 0.022,
+ "probabilite_sous_cible_avec": 0.056,
+ "sp_mensuel_sans": [
+  [
+   0.6691,
+   0.8392,
+   0.5185
+  ],
+  [
+   0.7307,
+   0.9042,
+   0.5755
+  ],
+  [
+   0.7961,
+   0.9723,
+   0.6324
+  ]
+ ],
+ "sp_mensuel_avec": [
+  [
+   0.7167,
+   0.8066,
+   0.476
+  ],
+  [
+   0.779,
+   0.8709,
+   0.5336
+  ],
+  [
+   0.8454,
+   0.9401,
+   0.5907
+  ]
+ ],
+ "sp_glissant_12m_actuel": 0.7436,
+ "sp_glissant_12m_fin_sans": [
+  0.7403,
+  0.7492,
+  0.7587
+ ],
+ "sp_glissant_12m_fin_avec": [
+  0.7377,
+  0.7467,
+  0.7566
+ ],
+ "actions": [
+  {
+   "Act_ID": "A1",
+   "Act_Action": "Prévenir les dégâts des eaux",
+   "Act_Volet": "Prévenir",
+   "Act_Responsable": "Direction prévention",
+   "Act_Cible": "963 contrats à risque élevé sans détecteur de fuite",
+   "Act_Nb": 963,
+   "Act_Hypothese": "10 à 25 % de dégâts des eaux en moins sur ces contrats (écart observé : -18 %, non causal)",
+   "Act_KPI": "Fréquence dégâts des eaux des contrats équipés vs groupe témoin",
+   "Act_Effet_P10": 11518,
+   "Act_Effet_P50": 17338,
+   "Act_Effet_P90": 23666,
+   "Act_Points_SP": 0.57
+  },
+  {
+   "Act_ID": "A2",
+   "Act_Action": "Revoir les règlements atypiques avant paiement",
+   "Act_Volet": "Indemniser",
+   "Act_Responsable": "Direction indemnisation",
+   "Act_Cible": "8 règlements 2026 hors fourchette attendue, puis le flux à venir",
+   "Act_Nb": 8,
+   "Act_Hypothese": "20 à 40 % du dépassement évité par une revue avant paiement",
+   "Act_KPI": "Montant évité par dossier revu ; taux de révision confirmée",
+   "Act_Effet_P10": 1164,
+   "Act_Effet_P50": 1585,
+   "Act_Effet_P90": 2002,
+   "Act_Points_SP": 0.05
+  },
+  {
+   "Act_ID": "A3",
+   "Act_Action": "Relancer les recours non encaissés",
+   "Act_Volet": "Indemniser",
+   "Act_Responsable": "Service recours",
+   "Act_Cible": "455 dossiers des 12 derniers mois : 588 047 € à encaisser",
+   "Act_Nb": 455,
+   "Act_Hypothese": "10 à 25 % du montant encaissé sous 3 mois",
+   "Act_KPI": "Taux d'encaissement des recours",
+   "Act_Effet_P10": 44767,
+   "Act_Effet_P50": 68694,
+   "Act_Effet_P90": 92214,
+   "Act_Points_SP": 2.24
+  },
+  {
+   "Act_ID": "A4",
+   "Act_Action": "Ajuster les provisions sous-estimées",
+   "Act_Volet": "Fiabiliser",
+   "Act_Responsable": "Actuariat / indemnisation",
+   "Act_Cible": "79 dossiers ouverts sous la fourchette attendue",
+   "Act_Nb": 79,
+   "Act_Hypothese": "70 à 100 % du complément estimé passé en charge : le S/P se dégrade d'abord, la surprise est évitée",
+   "Act_KPI": "Écart provision / coût final à la clôture",
+   "Act_Effet_P10": -72298,
+   "Act_Effet_P50": -63513,
+   "Act_Effet_P90": -54393,
+   "Act_Points_SP": -2.08
+  },
+  {
+   "Act_ID": "A5",
+   "Act_Action": "Réviser le tarif des contrats déficitaires à l'échéance",
+   "Act_Volet": "Renouveler",
+   "Act_Responsable": "Direction technique",
+   "Act_Cible": "508 contrats à S/P > 150 % arrivant à échéance d'ici 3 mois",
+   "Act_Nb": 508,
+   "Act_Hypothese": "+5 à +12 % de prime à l'échéance, sans perte de client (à vérifier)",
+   "Act_KPI": "Taux de majoration accepté ; taux de résiliation",
+   "Act_Effet_P10": 4423,
+   "Act_Effet_P50": 6592,
+   "Act_Effet_P90": 8805,
+   "Act_Points_SP": 0.22
+  }
+ ],
+ "taches": {
+  "A5": 508,
+  "A4": 79,
+  "A1": 50,
+  "A3": 30,
+  "GLI": 30,
+  "A2": 8
+ },
+ "avertissement": "Projection sur données synthétiques ; efficacités = hypothèses de cadrage à mesurer par groupe témoin."
+}

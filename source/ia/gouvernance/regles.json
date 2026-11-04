@@ -1,0 +1,237 @@
+[
+ {
+  "variable": "vCibleSP",
+  "valeur": "0.68",
+  "signification": "cible S/P du portefeuille"
+ },
+ {
+  "variable": "vSeuilSPContrat",
+  "valeur": "1.5",
+  "signification": "S/P d'un contrat à revoir avant échéance"
+ },
+ {
+  "variable": "vHorizonEcheanceMois",
+  "valeur": "3",
+  "signification": "horizon « échéance proche » (mois)"
+ },
+ {
+  "variable": "vAncienClientT1",
+  "valeur": "3",
+  "signification": "ancienneté client : 1re tranche (ans)"
+ },
+ {
+  "variable": "vAncienClientT2",
+  "valeur": "6",
+  "signification": "ancienneté client : 2e tranche (ans)"
+ },
+ {
+  "variable": "vPartDDEAction",
+  "valeur": "0.5",
+  "signification": "part dégâts des eaux déclenchant la piste « prévention fuite »"
+ },
+ {
+  "variable": "vNbSinAction",
+  "valeur": "4",
+  "signification": "nombre de sinistres déclenchant la piste « revoir la franchise »"
+ },
+ {
+  "variable": "vSeuilGrave",
+  "valeur": "5000",
+  "signification": "sinistre de pointe (€)"
+ },
+ {
+  "variable": "vAgeRecentJ",
+  "valeur": "30",
+  "signification": "ancienneté dossier : récent (j)"
+ },
+ {
+  "variable": "vAgeSurveilJ",
+  "valeur": "90",
+  "signification": "ancienneté dossier : à surveiller (j)"
+ },
+ {
+  "variable": "vAgeAncienJ",
+  "valeur": "180",
+  "signification": "ancienneté dossier : stock ancien (j)"
+ },
+ {
+  "variable": "vPartStockAncien",
+  "valeur": "0.25",
+  "signification": "part du stock ancien rendant la revue prioritaire"
+ },
+ {
+  "variable": "vRecoursOK",
+  "valeur": "0.8",
+  "signification": "taux d'encaissement des recours jugé maîtrisé"
+ },
+ {
+  "variable": "vDelaiDeclaJ",
+  "valeur": "7",
+  "signification": "délai moyen de déclaration jugé correct (j)"
+ },
+ {
+  "variable": "vEcartGestion",
+  "valeur": "1.2",
+  "signification": "surcharge d'un gestionnaire vs moyenne"
+ },
+ {
+  "variable": "vReductionDefaut",
+  "valeur": "10",
+  "signification": "réduction de charge proposée par défaut (%)"
+ },
+ {
+  "variable": "vFraudeVolJ",
+  "valeur": "2",
+  "signification": "vol déclaré au-delà de N jours"
+ },
+ {
+  "variable": "vFraudeMontantMin",
+  "valeur": "3300",
+  "signification": "bas de la zone « juste sous le seuil »"
+ },
+ {
+  "variable": "vSeuilExpertise",
+  "valeur": "3500",
+  "signification": "seuil d'expertise (€)"
+ },
+ {
+  "variable": "vFraudeNbSin",
+  "valeur": "3",
+  "signification": "nombre de sinistres sur le contrat"
+ },
+ {
+  "variable": "vFraudeEffetJ",
+  "valeur": "90",
+  "signification": "sinistre peu après la prise d'effet (j)"
+ },
+ {
+  "variable": "vFraudeSignauxMin",
+  "valeur": "2",
+  "signification": "signaux cumulés pour un contrôle prioritaire"
+ },
+ {
+  "variable": "vGLIDetectJ",
+  "valeur": "15",
+  "signification": "détection jugée lente (j)"
+ },
+ {
+  "variable": "vGLIDeclaJ",
+  "valeur": "60",
+  "signification": "déclaration jugée tardive (j)"
+ },
+ {
+  "variable": "vGLINbLoyersDecla",
+  "valeur": "2",
+  "signification": "loyers impayés imposant une déclaration"
+ },
+ {
+  "variable": "vGLIPtsRetard",
+  "valeur": "25",
+  "signification": "points par retard ou partiel sur 3 mois"
+ },
+ {
+  "variable": "vGLIMaxRetards",
+  "valeur": "2",
+  "signification": "retards comptés au maximum"
+ },
+ {
+  "variable": "vGLIPtsPartiel",
+  "valeur": "20",
+  "signification": "points pour un partiel sur 6 mois"
+ },
+ {
+  "variable": "vGLISeuilEffort",
+  "valeur": "35",
+  "signification": "taux d'effort à risque (%)"
+ },
+ {
+  "variable": "vGLIPtsEffort",
+  "valeur": "15",
+  "signification": ""
+ },
+ {
+  "variable": "vGLIPtsProfil",
+  "valeur": "10",
+  "signification": "CDD / intérim ou indépendant"
+ },
+ {
+  "variable": "vGLISeuilRetardMoyenJ",
+  "valeur": "15",
+  "signification": "retard moyen à risque (j)"
+ },
+ {
+  "variable": "vGLIPtsRetardMoyen",
+  "valeur": "10",
+  "signification": ""
+ },
+ {
+  "variable": "vGLIVigilanceElevee",
+  "valeur": "50",
+  "signification": "score de vigilance élevée"
+ },
+ {
+  "variable": "vGLIVigilanceModeree",
+  "valeur": "25",
+  "signification": "score de vigilance modérée"
+ },
+ {
+  "variable": "vEffortT1",
+  "valeur": "25",
+  "signification": "tranches de taux d'effort (%)"
+ },
+ {
+  "variable": "vEffortT2",
+  "valeur": "33",
+  "signification": ""
+ },
+ {
+  "variable": "vEffortT3",
+  "valeur": "38",
+  "signification": "Affichage"
+ },
+ {
+  "variable": "vTopN",
+  "valeur": "10",
+  "signification": ""
+ },
+ {
+  "variable": "vTopDossiers",
+  "valeur": "5",
+  "signification": "dossiers sinistres les plus provisionnés"
+ },
+ {
+  "variable": "vTopBaux",
+  "valeur": "5",
+  "signification": "baux à appeler"
+ },
+ {
+  "variable": "vTopDossiersGLI",
+  "valeur": "5",
+  "signification": "dossiers GLI à débloquer"
+ },
+ {
+  "variable": "vTopAgences",
+  "valeur": "6",
+  "signification": "agences qui creusent l'écart"
+ },
+ {
+  "variable": "vTopContrats",
+  "valeur": "6",
+  "signification": "contrats à revoir"
+ },
+ {
+  "variable": "vTopCauses",
+  "valeur": "8",
+  "signification": "causes de charge"
+ },
+ {
+  "variable": "vTopFraude",
+  "valeur": "6",
+  "signification": "dossiers à contrôler"
+ },
+ {
+  "variable": "vToleranceCtrl",
+  "valeur": "0.005",
+  "signification": "tolérance des contrôles de chargement (€)"
+ }
+]

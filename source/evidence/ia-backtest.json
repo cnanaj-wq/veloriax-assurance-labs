@@ -1,0 +1,71 @@
+{
+ "date_reference": "2026-10-28",
+ "graine": 20261104,
+ "donnees": "synthétiques",
+ "prevention_dde": {
+  "question": "Quels contrats auront un dégât des eaux dans les 10 prochains mois ?",
+  "apprentissage": "historique 2024 -> dégâts des eaux janv.-oct. 2025",
+  "test": "historique 2025 -> dégâts des eaux janv.-oct. 2026 (jamais vu par le modèle)",
+  "contrats_test": 12000,
+  "taux_reel": 0.0848,
+  "auc_modele": 0.637,
+  "auc_regle_simple": 0.571,
+  "regle_simple": "déjà eu un dégât des eaux sur 12 mois, puis absence de détecteur de fuite",
+  "part_captee_top10_modele": 0.207,
+  "part_captee_top20_modele": 0.361,
+  "part_captee_top20_regle": 0.284,
+  "attendus_vs_observes": [
+   1006,
+   1018
+  ],
+  "score": {
+   "contrats_eleves": 1200,
+   "dont_sans_detecteur": 963,
+   "charge_dde_attendue_eleves": 540172,
+   "charge_dde_attendue_totale": 2485236,
+   "cout_moyen_dde": 2500,
+   "frequence_observee_2026_par_detecteur": {
+    "Non": 0.0898,
+    "Oui": 0.0735
+   }
+  }
+ },
+ "cout_final": {
+  "question": "Combien coûtera réellement un sinistre encore ouvert ?",
+  "apprentissage": "sinistres clos survenus en 2024-2025",
+  "test": "sinistres clos survenus en 2026 (jamais vus)",
+  "sinistres_test": 2317,
+  "erreur_moyenne_modele_eur": 722,
+  "erreur_moyenne_mediane_par_cause_eur": 849,
+  "couverture_intervalle_80": 0.694,
+  "score": {
+   "sinistres_ouverts": 1033,
+   "provisions_insuffisantes": 79,
+   "complement_estime_eur": 74565,
+   "provisions_excessives": 182,
+   "ecart_net_dossiers_ouverts_eur": -242154,
+   "reglements_atypiques_2026": 8,
+   "montant_au_dela_attendu_eur": 26508
+  }
+ },
+ "gli_impaye": {
+  "question": "Quels locataires vont connaître un premier impayé dans les 90 jours ?",
+  "apprentissage": "situations mensuelles oct. 2024 - sept. 2025",
+  "test": "situations mensuelles janv. - juil. 2026 (jamais vues)",
+  "situations_test": 28062,
+  "taux_reel": 0.0239,
+  "auc_modele": 0.636,
+  "auc_regle_vigilance": 0.601,
+  "precision_top5_modele": 0.046,
+  "precision_top5_regle": 0.041,
+  "rappel_top5_modele": 0.096,
+  "rappel_top5_regle": 0.085,
+  "avance_mediane_jours": 58,
+  "score": {
+   "date_situation": "2026-10-06",
+   "baux_suivis": 4094,
+   "baux_en_alerte": 204,
+   "loyers_exposes_alerte_eur": 33768
+  }
+ }
+}

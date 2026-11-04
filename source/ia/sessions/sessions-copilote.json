@@ -1,0 +1,85 @@
+[
+ {
+  "question": "Briefing de la semaine",
+  "reponse": "5 signaux sur 5 demandent une décision : V1 S/P glissant 12 mois au-dessus de la cible (Direction technique) ; V2 Dégâts des eaux > 35 % de la charge de l’année (Direction prévention) ; V3 Provisions probablement insuffisantes (Direction indemnisation) ; V4 Recours à encaisser (Service recours) ; V5 Baux GLI en alerte d’impayé (Gestion GLI). À lancer d’abord : A3 · Relancer les recours non encaissés et A1 · Prévenir les dégâts des eaux. Contrôles de chargement conformes.",
+  "outils": [
+   "agent_veille {\"regles\":5}"
+  ],
+  "sources": [],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "briefing"
+ },
+ {
+  "question": "Où se forme l’écart à la cible ?",
+  "reponse": "Le S/P du portefeuille est de 70,6 % pour une cible de 68,0 % : l’écart représente 813 800 € de charges. Il se concentre sur Auvergne-Rhône-Alpes (441 760 €, S/P 74,9 %), Occitanie (362 960 €, S/P 73,7 %), Provence-Alpes-Côte d’Azur (326 360 €, S/P 73,1 %). En 2026, la charge de sinistres vient d’abord : dégâts des eaux (39,8 %) puis incendie (26,7 %). Piste : le volet 13 relie cet écart aux contrats exposés aux dégâts des eaux.",
+  "outils": [
+   "kpi_portefeuille",
+   "expliquer_ecart {\"axe\":\"region\",\"top\":3}",
+   "expliquer_ecart {\"axe\":\"garantie\",\"filtres\":{\"annee\":2026},\"top\":20}"
+  ],
+  "sources": [],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "ecart"
+ },
+ {
+  "question": "Que dois-je lancer lundi ?",
+  "reponse": "Deux chantiers d’abord. A3 Relancer les recours non encaissés (Service recours) : effet médian 68 694 € sur 3 mois, fourchette 44 767 € à 92 214 € ; A1 Prévenir les dégâts des eaux (Direction prévention) : effet médian 17 338 € sur 3 mois, fourchette 11 518 € à 23 666 €. Premières tâches : SIN-2026-02047, SIN-2025-02302, SIN-2026-00222 pour les recours, POL0001-076, POL0056-013, POL0001-044 pour les détecteurs de fuite. Ces efficacités sont des hypothèses : mesurez-les avec un groupe témoin.",
+  "outils": [
+   "plan_action",
+   "taches {\"action\":\"A3\",\"top\":3}",
+   "taches {\"action\":\"A1\",\"top\":3}"
+  ],
+  "sources": [],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "lundi"
+ },
+ {
+  "question": "Le S/P peut-il revenir sous 68 % ?",
+  "reponse": "Pas sur 3 mois. Le S/P glissant 12 mois est à 74,4 % ; fin janvier 2027 il serait vers 74,9 % sans action et 74,7 % avec le plan (8 chances sur 10 entre 73,8 % et 75,7 %). Sur le seul trimestre, le plan gagne environ 0,96 point et fait mieux dans 93,9 % des tirages. Revenir à 68 % demande des leviers tarifaires sur plusieurs renouvellements, pas un trimestre.",
+  "outils": [
+   "plan_action",
+   "rechercher_documents {\"question\":\"projection fourchette groupe témoin hypothèse\",\"k\":2}"
+  ],
+  "sources": [
+   "plan-action.md › A1 · Prévenir les dégâts des eaux",
+   "charte-ia.md › Charte d'usage de l'IA — VELORIAX ASSURANCE LABS"
+  ],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "cible"
+ },
+ {
+  "question": "Quelles provisions revoir ?",
+  "reponse": "79 dossiers ont une provision probablement insuffisante (complément estimé 74 566 €), 182 semblent surprovisionnés et 8 règlements sont atypiques. À revoir en premier : SIN-2026-01226 (Court-circuit électrique, 3 722 €), SIN-2026-00629 (Origine voisine, 3 650 €), SIN-2026-00504 (Court-circuit électrique, 3 615 €). Le modèle couvre 69 % des cas dans son intervalle à 80 % : un gestionnaire valide chaque dossier.",
+  "outils": [
+   "scores_ia {\"modele\":\"cout_final\",\"top\":3}"
+  ],
+  "sources": [],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "provisions"
+ },
+ {
+  "question": "Comment est calculé le ratio S/P ?",
+  "reponse": "Ratio S/P : Ratio des sommes (charges / primes), jamais moyenne ni somme de ratios mensuels. S/P de 70 % = 70 € de sinistres pour 100 € de primes, hors frais de gestion. Propriétaire : Direction technique. Contrôles : 4 recalculés à l’instant et conformes, 0 écart, 4 vérifiés au chargement.",
+  "outils": [
+   "gouvernance {\"sujet\":\"sp\"}",
+   "gouvernance {\"sujet\":\"controles\"}",
+   "rechercher_documents {\"question\":\"Comment est calculé le ratio S/P ?\",\"k\":2}"
+  ],
+  "sources": [
+   "kpi.md › Ratio S/P",
+   "solutions-ia.md › Rentabilité"
+  ],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "gouvernance"
+ },
+ {
+  "question": "Quels baux surveiller ?",
+  "reponse": "5 signaux sur 5 demandent une décision : V1 S/P glissant 12 mois au-dessus de la cible (Direction technique) ; V2 Dégâts des eaux > 35 % de la charge de l’année (Direction prévention) ; V3 Provisions probablement insuffisantes (Direction indemnisation) ; V4 Recours à encaisser (Service recours) ; V5 Baux GLI en alerte d’impayé (Gestion GLI). À lancer d’abord : A3 · Relancer les recours non encaissés et A1 · Prévenir les dégâts des eaux. Contrôles de chargement conformes.",
+  "outils": [
+   "agent_veille {\"regles\":5}"
+  ],
+  "sources": [],
+  "moteur": "Session enregistrée le 04/11/2026 · calcul sans LLM",
+  "intention": "briefing"
+ }
+]

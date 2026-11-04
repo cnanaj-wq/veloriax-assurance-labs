@@ -1,0 +1,100 @@
+
+// ===== Enrichissement métier (données synthétiques) — ajouté le 29/10/2026 =====
+// Clés uniques : ContratID (jointure dans Contrats) et MouvementID (dossiers). Aucun autre champ commun : pas de clé synthétique.
+// ===== PARAMÈTRES MÉTIER : modifier ici puis recharger les données =====
+// Rentabilité
+SET vCibleSP = 0.68;            // cible S/P du portefeuille
+SET vSeuilSPContrat = 1.5;      // S/P d'un contrat à revoir avant échéance
+SET vHorizonEcheanceMois = 3;   // horizon « échéance proche » (mois)
+SET vAncienClientT1 = 3;        // ancienneté client : 1re tranche (ans)
+SET vAncienClientT2 = 6;        // ancienneté client : 2e tranche (ans)
+SET vPartDDEAction = 0.5;       // part dégâts des eaux déclenchant la piste « prévention fuite »
+SET vNbSinAction = 4;           // nombre de sinistres déclenchant la piste « revoir la franchise »
+// Sinistres
+SET vSeuilGrave = 5000;         // sinistre de pointe (€)
+SET vAgeRecentJ = 30;           // ancienneté dossier : récent (j)
+SET vAgeSurveilJ = 90;          // ancienneté dossier : à surveiller (j)
+SET vAgeAncienJ = 180;          // ancienneté dossier : stock ancien (j)
+SET vPartStockAncien = 0.25;    // part du stock ancien rendant la revue prioritaire
+SET vRecoursOK = 0.8;           // taux d'encaissement des recours jugé maîtrisé
+SET vDelaiDeclaJ = 7;           // délai moyen de déclaration jugé correct (j)
+SET vEcartGestion = 1.2;        // surcharge d'un gestionnaire vs moyenne
+SET vReductionDefaut = 10;      // réduction de charge proposée par défaut (%)
+// Score de suspicion
+SET vFraudeVolJ = 2;            // vol déclaré au-delà de N jours
+SET vFraudeMontantMin = 3300;   // bas de la zone « juste sous le seuil »
+SET vSeuilExpertise = 3500;     // seuil d'expertise (€)
+SET vFraudeNbSin = 3;           // nombre de sinistres sur le contrat
+SET vFraudeEffetJ = 90;         // sinistre peu après la prise d'effet (j)
+SET vFraudeSignauxMin = 2;      // signaux cumulés pour un contrôle prioritaire
+// Garantie loyers impayés
+SET vGLIDetectJ = 15;           // détection jugée lente (j)
+SET vGLIDeclaJ = 60;            // déclaration jugée tardive (j)
+SET vGLINbLoyersDecla = 2;      // loyers impayés imposant une déclaration
+SET vGLIPtsRetard = 25;         // points par retard ou partiel sur 3 mois
+SET vGLIMaxRetards = 2;         // retards comptés au maximum
+SET vGLIPtsPartiel = 20;        // points pour un partiel sur 6 mois
+SET vGLISeuilEffort = 35;       // taux d'effort à risque (%)
+SET vGLIPtsEffort = 15;
+SET vGLIPtsProfil = 10;         // CDD / intérim ou indépendant
+SET vGLISeuilRetardMoyenJ = 15; // retard moyen à risque (j)
+SET vGLIPtsRetardMoyen = 10;
+SET vGLIVigilanceElevee = 50;   // score de vigilance élevée
+SET vGLIVigilanceModeree = 25;  // score de vigilance modérée
+SET vEffortT1 = 25;             // tranches de taux d'effort (%)
+SET vEffortT2 = 33;
+SET vEffortT3 = 38;
+// Affichage
+SET vTopN = 10;
+SET vTopDossiers = 5;           // dossiers sinistres les plus provisionnés
+SET vTopBaux = 5;               // baux à appeler
+SET vTopDossiersGLI = 5;        // dossiers GLI à débloquer
+SET vTopAgences = 6;            // agences qui creusent l'écart
+SET vTopContrats = 6;           // contrats à revoir
+SET vTopCauses = 8;             // causes de charge
+SET vTopFraude = 6;             // dossiers à contrôler
+SET vToleranceCtrl = 0.005;     // tolérance des contrôles de chargement (€)
+TmpRef: LOAD Max(DateMouvement) AS TmpMaxDate RESIDENT Mouvements;
+LET vADSDateRef = Num(Peek('TmpMaxDate',0,'TmpRef'));
+DROP TABLE TmpRef;
+
+LEFT JOIN (Contrats)
+LOAD ContratID, Activite, TrancheSurface, CanalDistribution,
+Num#(Franchise,'############0','.',',') AS Franchise,
+Date(Date#(DateEffet,'YYYY-MM-DD')) AS DateEffet,
+Num#(MoisEcheance,'0') AS MoisEcheanceNum,
+Dual(Month(MakeDate(2000,Num#(MoisEcheance,'0'))), Num#(MoisEcheance,'0')) AS MoisEcheance,
+If(Mod(Num#(MoisEcheance,'0') - Month($(vADSDateRef)) + 12, 12) >= 1 and Mod(Num#(MoisEcheance,'0') - Month($(vADSDateRef)) + 12, 12) <= $(vHorizonEcheanceMois), 'Oui', 'Non') AS EcheanceProche,
+DetecteurFuite,
+If(Year($(vADSDateRef)) - Year(Date#(DateEffet,'YYYY-MM-DD')) < $(vAncienClientT1), Dual('< $(vAncienClientT1) ans',1),
+ If(Year($(vADSDateRef)) - Year(Date#(DateEffet,'YYYY-MM-DD')) <= $(vAncienClientT2), Dual('$(vAncienClientT1) à $(vAncienClientT2) ans',2), Dual('> $(vAncienClientT2) ans',3))) AS AncienneteClient
+FROM [lib://ADS_PROTOTYPE_LOCAL/contrats_profil.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+
+SinistresDossiers:
+LOAD *,
+ If(Sin_Ouvert=1, If(Sin_AgeJours<$(vAgeRecentJ), Dual('< $(vAgeRecentJ) j',1), If(Sin_AgeJours<$(vAgeSurveilJ), Dual('$(vAgeRecentJ)–$(vAgeSurveilJ) j',2), If(Sin_AgeJours<$(vAgeAncienJ), Dual('$(vAgeSurveilJ)–$(vAgeAncienJ) j',3), Dual('> $(vAgeAncienJ) j',4)))), Null()) AS Sin_TrancheAge;
+LOAD MouvementID, Sin_Dossier,
+ Date(Date#(Sin_DateSurvenance,'YYYY-MM-DD')) AS Sin_DateSurvenance,
+ Date(Date#(Sin_DateDeclaration,'YYYY-MM-DD')) AS Sin_DateDeclaration,
+ If(Len(Sin_DateCloture)>0, Date(Date#(Sin_DateCloture,'YYYY-MM-DD'))) AS Sin_DateCloture,
+ Year(Date#(Sin_DateSurvenance,'YYYY-MM-DD')) AS Sin_AnneeSurvenance,
+ Date#(Sin_DateDeclaration,'YYYY-MM-DD') - Date#(Sin_DateSurvenance,'YYYY-MM-DD') AS Sin_DelaiDeclaration,
+ If(Len(Sin_DateCloture)>0, Date#(Sin_DateCloture,'YYYY-MM-DD') - Date#(Sin_DateDeclaration,'YYYY-MM-DD')) AS Sin_DureeGestion,
+ If(Len(Sin_DateCloture)=0, 1, 0) AS Sin_Ouvert,
+ If(Len(Sin_DateCloture)=0, $(vADSDateRef) - Date#(Sin_DateDeclaration,'YYYY-MM-DD')) AS Sin_AgeJours,
+ Sin_Statut, Sin_Cause,
+ Num#(Sin_Regle,'############0','.',',') AS Sin_Regle,
+ Num#(Sin_Provision,'############0','.',',') AS Sin_Provision,
+ Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') AS Sin_Charge,
+ If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') >= $(vSeuilGrave), 'Pointe (≥ ' & Num($(vSeuilGrave)/1000,'0') & ' k€)', 'Attritionnel') AS Sin_Severite,
+ If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 1000, Dual('< 1 k€',1),
+  If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 2000, Dual('1–2 k€',2),
+  If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 3500, Dual('2–3,5 k€',3),
+  If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 5000, Dual('3,5–5 k€',4), Dual('≥ 5 k€',5))))) AS Sin_TrancheCout,
+ Sin_Expertise, Sin_ConventionIRSI,
+ Num#(Sin_RecoursPotentiel,'############0','.',',') AS Sin_RecoursPotentiel,
+ Num#(Sin_RecoursEncaisse,'############0','.',',') AS Sin_RecoursEncaisse,
+ Sin_CanalDeclaration, Sin_Gestionnaire
+FROM [lib://ADS_PROTOTYPE_LOCAL/sinistres_dossiers.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);

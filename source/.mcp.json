@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "veloriax": {
+      "command": "node",
+      "args": ["ia/mcp/serveur.mjs"]
+    }
+  }
+}

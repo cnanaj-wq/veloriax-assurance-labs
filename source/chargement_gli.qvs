@@ -1,0 +1,74 @@
+
+// ===== Volet GLI — garantie loyers impayés (données synthétiques) — 29/10/2026 =====
+// Clés : AgenceID (GLI_Baux -> Contrats), GLI_BailID, GLI_DossierID. Tous les autres champs sont préfixés GLI_.
+GLI_Baux:
+LOAD GLI_BailID, AgenceID, GLI_TypeBien, Num#(GLI_Loyer,'0') AS GLI_Loyer, GLI_Profil,
+ Num#(GLI_TauxEffort,'0.0','.',',') AS GLI_TauxEffort,
+ If(Num#(GLI_TauxEffort,'0.0','.',',')<$(vEffortT1),Dual('< $(vEffortT1) %',1),If(Num#(GLI_TauxEffort,'0.0','.',',')<=$(vEffortT2),Dual('$(vEffortT1)–$(vEffortT2) %',2),If(Num#(GLI_TauxEffort,'0.0','.',',')<=$(vEffortT3),Dual('$(vEffortT2)–$(vEffortT3) %',3),Dual('> $(vEffortT3) %',4)))) AS GLI_TrancheEffort,
+ Date(Date#(GLI_DateEffet,'YYYY-MM-DD')) AS GLI_DateEffet,
+ If(Len(GLI_DateFin)>0,Date(Date#(GLI_DateFin,'YYYY-MM-DD'))) AS GLI_DateFin,
+ If(Len(GLI_DateFin)=0 or Date#(GLI_DateFin,'YYYY-MM-DD')>$(vADSDateRef),'Actif','Terminé') AS GLI_StatutBail,
+ GLI_SuiviAuto
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_baux.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+GLI_Echeances:
+LOAD GLI_BailID,
+ Date(Date#(GLI_Echeance,'YYYY-MM-DD')) AS GLI_Echeance,
+ Date(MonthStart(Date#(GLI_Echeance,'YYYY-MM-DD')),'MMM YYYY') AS GLI_MoisEch,
+ Year(Date#(GLI_Echeance,'YYYY-MM-DD')) AS GLI_AnneeEch,
+ Num#(GLI_Du,'0') AS GLI_Du, Num#(GLI_Paye,'0') AS GLI_Paye, Num#(GLI_Du,'0')-Num#(GLI_Paye,'0') AS GLI_Impaye,
+ If(Len(GLI_JoursRetard)>0,Num#(GLI_JoursRetard,'0')) AS GLI_JoursRetard, GLI_Statut,
+ If(Match(GLI_Statut,'Retard','Partiel'),1,0) AS GLI_Signal,
+ If(MonthStart(Date#(GLI_Echeance,'YYYY-MM-DD'))>=MonthStart(AddMonths($(vADSDateRef),-2)),1,0) AS GLI_3DerniersMois,
+ If(MonthStart(Date#(GLI_Echeance,'YYYY-MM-DD'))>=MonthStart(AddMonths($(vADSDateRef),-5)),1,0) AS GLI_6DerniersMois
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_echeances.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+GLI_Dossiers:
+LOAD *,
+ If(GLI_Ouvert=1 and GLI_PiecesCompletes='Non',1,0) AS GLI_AlertePieces,
+ If(GLI_DelaiDetection>$(vGLIDetectJ),1,0) AS GLI_AlerteDetection,
+ If(GLI_DelaiDeclaration>$(vGLIDeclaJ) or (GLI_NbLoyersImpayes>=$(vGLINbLoyersDecla) and IsNull(GLI_DelaiDeclaration) and GLI_Ouvert=1 and GLI_AgeDossier>$(vGLIDeclaJ)),1,0) AS GLI_AlerteDeclaration;
+LOAD GLI_DossierID, GLI_BailID,
+ Date(Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DatePremierImpaye,
+ Date(MonthStart(Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')),'MMM YYYY') AS GLI_MoisPremierImpaye,
+ If(Len(GLI_DateDetection)>0,Date(Date#(GLI_DateDetection,'YYYY-MM-DD'))) AS GLI_DateDetection,
+ If(Len(GLI_DateDeclaration)>0,Date(Date#(GLI_DateDeclaration,'YYYY-MM-DD'))) AS GLI_DateDeclaration,
+ If(Len(GLI_DateIndemnisation)>0,Date(Date#(GLI_DateIndemnisation,'YYYY-MM-DD'))) AS GLI_DateIndemnisation,
+ If(Len(GLI_DateCloture)>0,Date(Date#(GLI_DateCloture,'YYYY-MM-DD'))) AS GLI_DateCloture,
+ If(Len(GLI_DateDetection)>0,Date#(GLI_DateDetection,'YYYY-MM-DD')-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DelaiDetection,
+ If(Len(GLI_DateDeclaration)>0,Date#(GLI_DateDeclaration,'YYYY-MM-DD')-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DelaiDeclaration,
+ If(Len(GLI_DateCloture)>0,Date#(GLI_DateCloture,'YYYY-MM-DD')-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DureeTraitement,
+ If(Len(GLI_DateCloture)=0,1,0) AS GLI_Ouvert,
+ If(Len(GLI_DateCloture)=0,$(vADSDateRef)-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_AgeDossier,
+ Num#(GLI_NbLoyersImpayes,'0') AS GLI_NbLoyersImpayes,
+ Num#(GLI_MontantImpaye,'0') AS GLI_MontantImpaye, Num#(GLI_MontantIndemnise,'0') AS GLI_MontantIndemnise,
+ Num#(GLI_MontantRecouvre,'0') AS GLI_MontantRecouvre,
+ If(Len(GLI_DateCloture)=0,Num#(GLI_MontantImpaye,'0')-Num#(GLI_MontantRecouvre,'0')) AS GLI_Encours,
+ GLI_PiecesCompletes, If(Len(GLI_PieceManquante)>0,GLI_PieceManquante) AS GLI_PieceManquante,
+ GLI_EtapeActuelle, GLI_Procedure, GLI_SignalPrealable, GLI_Gestionnaire
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_dossiers.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+GLI_Etapes:
+LOAD GLI_DossierID, Num#(GLI_EtapeOrdre,'0') AS GLI_EtapeOrdre,
+ Dual(GLI_Etape, Match(GLI_Etape,'Premier impayé','Détection et relance amiable','Mise en demeure','Commandement de payer','Déclaration à l’assureur','Indemnisation','Procédure d’expulsion','Recouvrement','Régularisation','Clôture')) AS GLI_Etape,
+ Date(Date#(GLI_DateEtape,'YYYY-MM-DD')) AS GLI_DateEtape
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_etapes.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+// Signaux précoces par bail (règles métier explicites, sans IA) sur les échéances récentes
+TmpSig:
+LOAD GLI_BailID,
+ Sum(If(GLI_3DerniersMois=1,GLI_Signal)) AS GLI_Retards3M,
+ Sum(If(GLI_6DerniersMois=1 and GLI_Statut='Partiel',1)) AS GLI_Partiels6M,
+ Avg(If(GLI_3DerniersMois=1,GLI_JoursRetard)) AS GLI_RetardMoyen3M,
+ Sum(If(GLI_3DerniersMois=1 and GLI_Statut='Impayé',1)) AS GLI_Impayes3M
+RESIDENT GLI_Echeances GROUP BY GLI_BailID;
+LEFT JOIN (GLI_Baux) LOAD * RESIDENT TmpSig; DROP TABLE TmpSig;
+LEFT JOIN (GLI_Baux)
+LOAD GLI_BailID,
+ RangeMin(Alt(GLI_Retards3M,0),$(vGLIMaxRetards))*$(vGLIPtsRetard) + RangeMin(Alt(GLI_Partiels6M,0),1)*$(vGLIPtsPartiel) + If(GLI_TauxEffort>$(vGLISeuilEffort),$(vGLIPtsEffort),0)
+ + If(Match(GLI_Profil,'CDD / intérim','Indépendant'),$(vGLIPtsProfil),0) + If(Alt(GLI_RetardMoyen3M,0)>$(vGLISeuilRetardMoyenJ),$(vGLIPtsRetardMoyen),0) AS GLI_ScoreVigilance
+RESIDENT GLI_Baux;
+GLI_Niveaux:
+LOAD GLI_BailID,
+ If(Alt(GLI_Impayes3M,0)>0,Dual('En impayé',4),If(GLI_ScoreVigilance>=$(vGLIVigilanceElevee),Dual('Vigilance élevée',3),If(GLI_ScoreVigilance>=$(vGLIVigilanceModeree),Dual('Vigilance modérée',2),Dual('Sans signal',1)))) AS GLI_Vigilance
+RESIDENT GLI_Baux WHERE GLI_StatutBail='Actif';

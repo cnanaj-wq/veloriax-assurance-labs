@@ -1,0 +1,35 @@
+[
+ {
+  "id": "prevention_dde",
+  "nom": "Prévention dégâts des eaux",
+  "version": "1.0",
+  "type": "Gradient boosting (classification)",
+  "question": "Quels contrats auront un dégât des eaux dans les 10 prochains mois ?",
+  "donnees": "profil du contrat, historique de sinistres sur 12 mois",
+  "validation": "historique 2025 -> dégâts des eaux janv.-oct. 2026 (jamais vu par le modèle) : AUC 0.637 (règle simple 0.571) ; en ciblant 20 % des contrats, 36% des dégâts des eaux captés (règle simple 28%)",
+  "usage": "Prioriser les visites et la pose de détecteurs. Jamais pour tarifer ou refuser un client seul.",
+  "limites": "Données synthétiques ; pouvoir discriminant modéré ; un score n'est pas une certitude individuelle."
+ },
+ {
+  "id": "cout_final",
+  "nom": "Coût final des sinistres",
+  "version": "1.0",
+  "type": "Gradient boosting (régression quantile)",
+  "question": "Combien coûtera réellement un sinistre encore ouvert ?",
+  "donnees": "garantie, cause, expertise, IRSI, délai de déclaration, profil",
+  "validation": "sinistres clos survenus en 2026 (jamais vus) : erreur moyenne 722 € (médiane par cause 849 €) ; fourchette 10–90 % couvrant 69% des cas (visé 80 %)",
+  "usage": "Signaler les provisions à revoir et les règlements atypiques. La décision reste au gestionnaire.",
+  "limites": "Fourchette un peu trop étroite (69 % de couverture) : à recalibrer ; aucune donnée de tâche ni de pièce."
+ },
+ {
+  "id": "gli_impaye",
+  "nom": "Impayé de loyer à 90 jours",
+  "version": "1.0",
+  "type": "Gradient boosting (classification)",
+  "question": "Quels locataires vont connaître un premier impayé dans les 90 jours ?",
+  "donnees": "historique de paiement sur 6 mois, taux d'effort, profil, bien",
+  "validation": "situations mensuelles janv. - juil. 2026 (jamais vues) : AUC 0.636 (règle de vigilance 0.601) ; avance médiane 58 jours",
+  "usage": "Contacter le bailleur avant le premier impayé, en complément du score par règles.",
+  "limites": "Gain faible sur la règle existante : la règle suffit presque. Résultat conservé et affiché tel quel."
+ }
+]

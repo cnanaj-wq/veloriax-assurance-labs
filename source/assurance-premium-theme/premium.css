@@ -1,0 +1,37 @@
+.assurance-premium .qv-panel-sheet{background:#eef2f6!important}
+.assurance-premium .qv-object{border:1px solid #dfe7ee!important;border-radius:12px!important;box-shadow:0 3px 10px #15334d09;background:#fff;box-sizing:border-box}
+.assurance-premium .qv-object-header{padding:8px 10px 0!important}
+.assurance-premium .qv-object-title-text{font-weight:650;letter-spacing:-.2px}
+.assurance-premium .qv-object-kpi{border-top:3px solid #138995!important;padding:10px 16px!important}
+.assurance-premium .qv-object-vCHPP,.assurance-premium .qv-object-p-gap,.assurance-premium .qv-object-s-remaining{border-top-color:#C14953!important}
+.assurance-premium .sn-kpi-measure-wrapper{font-size:15px!important;letter-spacing:.1px;color:#5b6c7d!important}
+.assurance-premium .sn-kpi-value{font-size:42px!important;font-weight:600!important;letter-spacing:-1.4px}
+.assurance-premium .qv-object-action-button{overflow:hidden;box-shadow:none;border:0!important}
+.assurance-premium .qv-object-text-image .qv-media-tool-html{padding:16px 20px!important;box-sizing:border-box;line-height:1.65;font-size:15px!important;color:#41546a}
+.assurance-premium .qv-object-p-intro,.assurance-premium .qv-object-a-intro,.assurance-premium .qv-object-s-intro,.assurance-premium .qv-object-q-intro{background:linear-gradient(105deg,#122a43,#234c66)!important;border:0!important}
+.assurance-premium .qv-object-p-intro .qv-media-tool-html,.assurance-premium .qv-object-a-intro .qv-media-tool-html,.assurance-premium .qv-object-s-intro .qv-media-tool-html,.assurance-premium .qv-object-q-intro .qv-media-tool-html{color:#edf5ff!important;font-size:15px!important}
+.assurance-premium .qv-object-p-intro b:first-child,.assurance-premium .qv-object-a-intro b:first-child,.assurance-premium .qv-object-s-intro b:first-child,.assurance-premium .qv-object-q-intro b:first-child{font-size:24px;letter-spacing:-.4px;color:white}
+.assurance-premium .qv-object-p-method,.assurance-premium .qv-object-a-next,.assurance-premium .qv-object-s-decision,.assurance-premium .qv-object-q-audit{background:#f5f9fb!important;border-left:3px solid #138995!important}
+.assurance-premium .qv-object-p-method b,.assurance-premium .qv-object-a-next b,.assurance-premium .qv-object-s-decision b,.assurance-premium .qv-object-q-audit b{color:#163f5d}
+.assurance-premium .qv-object-s-limit,.assurance-premium .qv-object-q-scope{background:#fbf8f0!important;border-color:#e9dfc7!important}
+.assurance-premium .qv-object-sn-table{padding:4px 8px!important}
+@media(max-width:1300px){.assurance-premium .sn-kpi-value{font-size:32px!important}.assurance-premium .sn-kpi-measure-wrapper{font-size:12px!important}.assurance-premium .qv-object-text-image .qv-media-tool-html{font-size:12px!important;padding:10px!important;line-height:1.5}.assurance-premium .qv-object-p-intro b:first-child,.assurance-premium .qv-object-a-intro b:first-child,.assurance-premium .qv-object-s-intro b:first-child,.assurance-premium .qv-object-q-intro b:first-child{font-size:19px}}
+.assurance-premium .qv-object-text-image .qv-inner-object,.assurance-premium .qv-object-text-image .qv-object-content-container,.assurance-premium .qv-object-text-image .qv-object-content,.assurance-premium .qv-object-text-image .qv-object-header{background:transparent!important}
+.assurance-premium .qv-object-text-image .qv-media-tool-html p{margin:0!important}
+
+.assurance-premium .qv-object-p-intro .qv-media-tool-html,.assurance-premium .qv-object-a-intro .qv-media-tool-html,.assurance-premium .qv-object-s-intro .qv-media-tool-html,.assurance-premium .qv-object-q-intro .qv-media-tool-html{padding:12px 22px!important;line-height:1.5}
+
+
+.assurance-premium .qv-object-text-image .qv-media-tool-html{line-height:1.45!important}
+
+
+.assurance-premium #grid-wrap{width:100%!important;max-width:1800px;margin-left:auto;margin-right:auto}.assurance-premium .qv-object-g-intro .qv-media-tool-html{padding:8px 16px!important;font-size:12px!important}.assurance-premium .qv-object-g-note .qv-media-tool-html{padding:8px 16px!important;font-size:11px!important}
+.assurance-premium .qv-object-kpi{padding:8px 14px!important}.assurance-premium .sn-kpi-value{font-size:36px!important;line-height:1.1!important;letter-spacing:-1px}.assurance-premium .sn-kpi-measure-wrapper{font-size:13px!important}.assurance-premium .qv-object-text-image .qv-media-tool-html{font-size:13px!important;line-height:1.45!important;padding:12px 16px!important}.assurance-premium .qv-object-p-intro b:first-child,.assurance-premium .qv-object-a-intro b:first-child,.assurance-premium .qv-object-s-intro b:first-child,.assurance-premium .qv-object-q-intro b:first-child{font-size:21px!important}
+/* Simulation: four filled cards, without invented decorative data. */
+.assurance-premium .qv-object-s-rate{background:linear-gradient(115deg,#152d46,#284d70)!important;border-color:#284d70!important}
+.assurance-premium .qv-object-s-saving{background:linear-gradient(115deg,#07594e,#147c68)!important;border-color:#147c68!important}
+.assurance-premium .qv-object-s-ratio{background:linear-gradient(115deg,#075363,#087d8a)!important;border-color:#087d8a!important}
+.assurance-premium .qv-object-s-remaining{background:linear-gradient(115deg,#702d3a,#a64352)!important;border-color:#a64352!important}
+.assurance-premium :is(.qv-object-s-rate,.qv-object-s-saving,.qv-object-s-ratio,.qv-object-s-remaining){padding:14px 20px!important;box-shadow:0 6px 16px #132c4920!important}
+.assurance-premium :is(.qv-object-s-rate,.qv-object-s-saving,.qv-object-s-ratio,.qv-object-s-remaining) :is(.qv-inner-object,.qv-object-content-container,.qv-object-content){background:transparent!important}
+.assurance-premium :is(.qv-object-s-rate,.qv-object-s-saving,.qv-object-s-ratio,.qv-object-s-remaining) :is(.sn-kpi-value,.sn-kpi-measure-wrapper){color:white!important}

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; media-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Veloriax Assurance Labs</title>
+<meta name="description" content="Version web du démonstrateur Qlik Sense de BI augmentée par l'IA pour l'assurance IARD : où se forme l'écart de S/P, ce que l'IA voit venir, quoi lancer lundi, avec un copilote tracé et une gouvernance écrite.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="evitement" href="#contenu">Aller au contenu</a>
+
+<header class="bandeau-titre">
+  <div class="bandeau-titre__texte">
+    <h1>Veloriax Assurance Labs</h1>
+    <p>Assurance IARD : où se forme l'écart, ce que l'IA voit venir, ce qu'on lance lundi</p>
+  </div>
+  <nav class="onglets" role="tablist" aria-label="Pages du dashboard">
+    <button role="tab" id="onglet-synthese" aria-controls="page-synthese" data-page="synthese">Synthèse</button>
+    <button role="tab" id="onglet-anticiper" aria-controls="page-anticiper" data-page="anticiper">Anticiper</button>
+    <button role="tab" id="onglet-plan" aria-controls="page-plan" data-page="plan">Plan d'action</button>
+    <button role="tab" id="onglet-copilote" aria-controls="page-copilote" data-page="copilote">Copilote</button>
+    <button role="tab" id="onglet-gouvernance" aria-controls="page-gouvernance" data-page="gouvernance">Gouvernance</button>
+  </nav>
+</header>
+
+<p class="avertissement">Démonstrateur sur données synthétiques : 12 000 contrats, 418 863 mouvements. Aucun chiffre ne provient d'un assureur réel.</p>
+
+<main id="contenu">
+  <noscript><p class="info">Ce dashboard a besoin de JavaScript pour afficher les chiffres et les graphiques.</p></noscript>
+
+  <section class="page" id="page-synthese" role="tabpanel" aria-labelledby="onglet-synthese" tabindex="-1">
+    <div class="page__tete">
+      <div>
+        <h2>Où se forme l'écart à la cible</h2>
+        <p class="sous-titre">Le S/P se calcule comme le rapport des sommes, jamais comme une moyenne de ratios.</p>
+      </div>
+    </div>
+    <div class="kpis" id="kpis-synthese"></div>
+    <div class="grille-2">
+      <article class="carte">
+        <h3>Écart à la cible par région</h3>
+        <p class="sous-titre">Charges au-delà de 68 % des primes · cliquez sur une région pour voir son détail</p>
+        <div class="graphe" id="g-regions"></div>
+        <p class="info" id="detail-region" aria-live="polite"></p>
+      </article>
+      <article class="carte">
+        <h3>D'où vient la charge de sinistres en 2026</h3>
+        <p class="sous-titre">Part de chaque garantie · les primes ne sont pas réparties par garantie : pas de S/P par garantie</p>
+        <div class="graphe" id="g-garanties"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="page" id="page-anticiper" role="tabpanel" aria-labelledby="onglet-anticiper" tabindex="-1" hidden>
+    <div class="page__tete">
+      <div>
+        <h2>Ce que l'IA voit venir</h2>
+        <p class="sous-titre">Trois modèles validés sur une période qu'ils n'avaient jamais vue, avec leur preuve et leur limite.</p>
+      </div>
+    </div>
+    <div class="modeles" id="modeles"></div>
+    <article class="carte">
+      <div class="carte__tete">
+        <div>
+          <h3>Les listes de travail produites par les modèles</h3>
+          <p class="sous-titre" id="st-liste"></p>
+        </div>
+        <div class="segments" role="group" aria-label="Choisir la liste">
+          <button type="button" data-liste="dde" aria-pressed="true">Dégâts des eaux</button>
+          <button type="button" data-liste="cout" aria-pressed="false">Provisions</button>
+          <button type="button" data-liste="gli" aria-pressed="false">Impayés GLI</button>
+        </div>
+      </div>
+      <div class="defilement-tableau"><table class="tableau" id="t-liste"></table></div>
+    </article>
+  </section>
+
+  <section class="page" id="page-plan" role="tabpanel" aria-labelledby="onglet-plan" tabindex="-1" hidden>
+    <div class="page__tete">
+      <div>
+        <h2>Ce qu'on lance lundi, et ce que cela peut changer</h2>
+        <p class="sous-titre">Une fourchette, pas une promesse : 5 000 scénarios de sinistralité, efficacités à mesurer par groupe témoin.</p>
+      </div>
+    </div>
+    <div class="kpis" id="kpis-plan"></div>
+    <div class="grille-2">
+      <article class="carte">
+        <h3>S/P glissant 12 mois : la tendance et ce que le plan peut infléchir</h3>
+        <p class="sous-titre">Bande = 8 chances sur 10 · la cible de 68 % est hors de l’échelle : elle ne se rejoint pas en un trimestre</p>
+        <div class="graphe graphe--haut" id="g-projection"></div>
+      </article>
+      <article class="carte">
+        <h3>Effet de chaque action sur 3 mois</h3>
+        <p class="sous-titre">Médiane et fourchette P10–P90 en € de charge évitée · rouge = dégrade le S/P à court terme</p>
+        <div id="g-actions"></div>
+      </article>
+    </div>
+    <article class="carte">
+      <h3>Les tâches de la semaine</h3>
+      <p class="sous-titre">Les premières tâches de chaque action, classées par l'IA · un humain valide chaque geste</p>
+      <div class="defilement-tableau"><table class="tableau" id="t-taches"></table></div>
+    </article>
+  </section>
+
+  <section class="page" id="page-copilote" role="tabpanel" aria-labelledby="onglet-copilote" tabindex="-1" hidden>
+    <div class="page__tete">
+      <div>
+        <h2>Demander, vérifier, décider</h2>
+        <p class="sous-titre">Réponses enregistrées du copilote : chacune affiche les outils interrogés et les documents cités.</p>
+      </div>
+    </div>
+    <div class="grille-copilote">
+      <article class="carte copilote">
+        <h3>Copilote de décision</h3>
+        <div class="suggestions" id="suggestions" role="group" aria-label="Questions"></div>
+        <div class="fil" id="fil" aria-live="polite"><p class="fil__vide">Choisissez une question : la réponse enregistrée s'affiche avec sa trace.</p></div>
+      </article>
+      <article class="carte">
+        <h3>Briefing de la semaine</h3>
+        <p class="sous-titre" id="st-veille"></p>
+        <ul class="alertes" id="alertes"></ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="page" id="page-gouvernance" role="tabpanel" aria-labelledby="onglet-gouvernance" tabindex="-1" hidden>
+    <div class="page__tete">
+      <div>
+        <h2>D'où vient ce chiffre, et qui en répond</h2>
+        <p class="sous-titre">Définitions, fiches des modèles, contrôles et charte : ce que le copilote applique.</p>
+      </div>
+    </div>
+    <div class="grille-2">
+      <article class="carte">
+        <h3>Charte d'usage de l'IA</h3>
+        <ol class="charte" id="charte"></ol>
+      </article>
+      <article class="carte">
+        <h3>Contrôles de chargement</h3>
+        <p class="sous-titre">Recalculés par le copilote à la demande · un écart bloque l'usage des chiffres</p>
+        <div class="defilement-tableau"><table class="tableau" id="t-controles"></table></div>
+      </article>
+    </div>
+    <article class="carte">
+      <h3>KPI gouvernés</h3>
+      <p class="sous-titre">Une définition, une règle, un propriétaire</p>
+      <div class="defilement-tableau"><table class="tableau" id="t-kpi"></table></div>
+    </article>
+    <article class="carte">
+      <h3>Fiches des modèles</h3>
+      <p class="sous-titre">Validés sur une période jamais vue · limites affichées telles quelles</p>
+      <div class="defilement-tableau"><table class="tableau" id="t-modeles"></table></div>
+    </article>
+  </section>
+</main>
+
+<footer class="pied">
+  <p>Version web du démonstrateur Qlik Sense VELORIAX ASSURANCE LABS : mêmes données, mêmes calculs, mêmes sorties des modèles.</p>
+  <p>Données synthétiques · Qlik Sense, Python (scikit-learn), serveur MCP Node.js, LLM local · Cédric NANA, consultant Data Analytics.</p>
+</footer>
+
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

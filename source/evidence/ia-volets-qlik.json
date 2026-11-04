@@ -1,0 +1,31 @@
+{
+ "navigation": [
+  "ads-home : 15 boutons",
+  "UHHjXj : 15 boutons",
+  "ads-analyse : 15 boutons",
+  "ads-claims : 15 boutons",
+  "ads-renewal : 15 boutons",
+  "ads-simulation : 15 boutons",
+  "ads-gli-detect : 15 boutons",
+  "ads-gli-pilot : 15 boutons",
+  "ads-replay : 15 boutons",
+  "ads-geo : 15 boutons",
+  "ads-quality : 15 boutons",
+  "ads-ai : 15 boutons",
+  "ads-journey : 15 boutons",
+  "ads-anticiper : 15 boutons",
+  "ads-copilote : 15 boutons"
+ ],
+ "controles": {
+  "ia-k-dde": "1 200 · dont 963 sans détecteur de fuite · 540 k€ de charge attendue sur 10 mois",
+  "ia-k-prov": "79 · complément estimé 75 k€ · 8 règlements atypiques à revoir",
+  "ia-k-gli": "204 · loyers exposés 34 k€ · signal 58 jours avant l’impayé (médiane)",
+  "ia-fan": "20 lignes",
+  "ia-plan": "5 lignes",
+  "ia-t-dde": "963 lignes",
+  "ia-t-prov": "79 lignes",
+  "ia-t-taches": "18 lignes",
+  "ia-t-gouv": "12 lignes",
+  "ia-t-modeles": "3 lignes"
+ }
+}

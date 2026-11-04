@@ -1,0 +1,292 @@
+LET vADSReloadStarted = Num(Now(1), '0.000000000', '.', '');
+SET ThousandSep=' ';
+SET DecimalSep=',';
+SET MoneyFormat='# ##0,00 €;-# ##0,00 €';
+SET DateFormat='DD/MM/YYYY';
+SET TimestampFormat='DD/MM/YYYY hh:mm:ss';
+SET MonthNames='janv.;févr.;mars;avr.;mai;juin;juil.;août;sept.;oct.;nov.;déc.';
+SET LongMonthNames='janvier;février;mars;avril;mai;juin;juillet;août;septembre;octobre;novembre;décembre';
+SET CreateSearchIndexOnReload=1;
+// Prototype technique. Données 100 % synthétiques. Aucun assureur réel.
+Contrats:
+LOAD ContratID, AgenceID, Agence, Region, Produit, StatutContrat
+FROM [lib://ADS_PROTOTYPE_LOCAL/contrats.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+ContractKeys:
+MAPPING LOAD ContratID,1 RESIDENT Contrats;
+Mouvements:
+LOAD MouvementID, ContratID,
+Date(Date#(DateMouvement,'YYYY-MM-DD')) AS DateMouvement,
+Year(Date#(DateMouvement,'YYYY-MM-DD')) AS Annee,
+Month(Date#(DateMouvement,'YYYY-MM-DD')) AS Mois,
+Date(MonthStart(Date#(DateMouvement,'YYYY-MM-DD')),'MMM YYYY') AS MoisDate,
+TypeMouvement, Garantie,
+Num#(MontantEUR,'############0','.',',') AS MontantEUR,
+If(Len(Trim(MontantEUR))=0 or IsNull(Num#(MontantEUR,'############0','.',',')),1,0) AS DQ_MontantManquant,
+If(Match(TypeMouvement,'PRIME','SINISTRE')=0,1,0) AS DQ_TypeInconnu,
+If(ApplyMap('ContractKeys',ContratID,0)=0,1,0) AS DQ_ContratOrphelin
+FROM [lib://ADS_PROTOTYPE_LOCAL/mouvements.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+// Table de référence indépendante, volontairement sans association métier.
+ControlesSource:
+LOAD Ctrl_ID,Ctrl_Description,Num#(Ctrl_Attendu,'############0','.',',') AS Ctrl_Attendu
+FROM [lib://ADS_PROTOTYPE_LOCAL/controles.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+
+// Cohorte CRM indépendante : aucune association avec Contrats ou Mouvements.
+CRMClients:
+LOAD CRM_Client,CRM_Region,CRM_Agence,CRM_Canal,CRM_Statut,
+Date(Date#(CRM_DateDevis,'YYYY-MM-DD')) as CRM_DateDevis,
+Date(Date#(CRM_DateSignature,'YYYY-MM-DD')) as CRM_DateSignature,
+Num#(CRM_DelaiSignature) as CRM_DelaiSignature,
+Date(Date#(CRM_DateFinObservation,'YYYY-MM-DD')) as CRM_DateFinObservation
+FROM [lib://ADS_PROTOTYPE_LOCAL/crm_clients.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+CRMEvenements:
+LOAD CRM_Client, Num#(CRM_Ordre) as CRM_Ordre, CRM_Etape,
+Date(Date#(CRM_DateEvenement,'YYYY-MM-DD')) as CRM_DateEvenement, CRM_Detail
+FROM [lib://ADS_PROTOTYPE_LOCAL/crm_evenements.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+
+// ===== Enrichissement métier (données synthétiques) — ajouté le 29/10/2026 =====
+// Clés uniques : ContratID (jointure dans Contrats) et MouvementID (dossiers). Aucun autre champ commun : pas de clé synthétique.
+// ===== PARAMÈTRES MÉTIER : modifier ici puis recharger les données =====
+// Rentabilité
+SET vCibleSP = 0.68;            // cible S/P du portefeuille
+SET vSeuilSPContrat = 1.5;      // S/P d'un contrat à revoir avant échéance
+SET vHorizonEcheanceMois = 3;   // horizon « échéance proche » (mois)
+SET vAncienClientT1 = 3;        // ancienneté client : 1re tranche (ans)
+SET vAncienClientT2 = 6;        // ancienneté client : 2e tranche (ans)
+SET vPartDDEAction = 0.5;       // part dégâts des eaux déclenchant la piste « prévention fuite »
+SET vNbSinAction = 4;           // nombre de sinistres déclenchant la piste « revoir la franchise »
+// Sinistres
+SET vSeuilGrave = 5000;         // sinistre de pointe (€)
+SET vAgeRecentJ = 30;           // ancienneté dossier : récent (j)
+SET vAgeSurveilJ = 90;          // ancienneté dossier : à surveiller (j)
+SET vAgeAncienJ = 180;          // ancienneté dossier : stock ancien (j)
+SET vPartStockAncien = 0.25;    // part du stock ancien rendant la revue prioritaire
+SET vRecoursOK = 0.8;           // taux d'encaissement des recours jugé maîtrisé
+SET vDelaiDeclaJ = 7;           // délai moyen de déclaration jugé correct (j)
+SET vEcartGestion = 1.2;        // surcharge d'un gestionnaire vs moyenne
+SET vReductionDefaut = 10;      // réduction de charge proposée par défaut (%)
+// Score de suspicion
+SET vFraudeVolJ = 2;            // vol déclaré au-delà de N jours
+SET vFraudeMontantMin = 3300;   // bas de la zone « juste sous le seuil »
+SET vSeuilExpertise = 3500;     // seuil d'expertise (€)
+SET vFraudeNbSin = 3;           // nombre de sinistres sur le contrat
+SET vFraudeEffetJ = 90;         // sinistre peu après la prise d'effet (j)
+SET vFraudeSignauxMin = 2;      // signaux cumulés pour un contrôle prioritaire
+// Garantie loyers impayés
+SET vGLIDetectJ = 15;           // détection jugée lente (j)
+SET vGLIDeclaJ = 60;            // déclaration jugée tardive (j)
+SET vGLINbLoyersDecla = 2;      // loyers impayés imposant une déclaration
+SET vGLIPtsRetard = 25;         // points par retard ou partiel sur 3 mois
+SET vGLIMaxRetards = 2;         // retards comptés au maximum
+SET vGLIPtsPartiel = 20;        // points pour un partiel sur 6 mois
+SET vGLISeuilEffort = 35;       // taux d'effort à risque (%)
+SET vGLIPtsEffort = 15;
+SET vGLIPtsProfil = 10;         // CDD / intérim ou indépendant
+SET vGLISeuilRetardMoyenJ = 15; // retard moyen à risque (j)
+SET vGLIPtsRetardMoyen = 10;
+SET vGLIVigilanceElevee = 50;   // score de vigilance élevée
+SET vGLIVigilanceModeree = 25;  // score de vigilance modérée
+SET vEffortT1 = 25;             // tranches de taux d'effort (%)
+SET vEffortT2 = 33;
+SET vEffortT3 = 38;
+// Affichage
+SET vTopN = 10;
+SET vTopDossiers = 5;           // dossiers sinistres les plus provisionnés
+SET vTopBaux = 5;               // baux à appeler
+SET vTopDossiersGLI = 5;        // dossiers GLI à débloquer
+SET vTopAgences = 6;            // agences qui creusent l'écart
+SET vTopContrats = 6;           // contrats à revoir
+SET vTopCauses = 8;             // causes de charge
+SET vTopFraude = 6;             // dossiers à contrôler
+SET vToleranceCtrl = 0.005;     // tolérance des contrôles de chargement (€)
+TmpRef: LOAD Max(DateMouvement) AS TmpMaxDate RESIDENT Mouvements;
+LET vADSDateRef = Num(Peek('TmpMaxDate',0,'TmpRef'));
+DROP TABLE TmpRef;
+
+LEFT JOIN (Contrats)
+LOAD ContratID, Activite, TrancheSurface, CanalDistribution,
+Num#(Franchise,'############0','.',',') AS Franchise,
+Date(Date#(DateEffet,'YYYY-MM-DD')) AS DateEffet,
+Num#(MoisEcheance,'0') AS MoisEcheanceNum,
+Dual(Month(MakeDate(2000,Num#(MoisEcheance,'0'))), Num#(MoisEcheance,'0')) AS MoisEcheance,
+If(Mod(Num#(MoisEcheance,'0') - Month($(vADSDateRef)) + 12, 12) >= 1 and Mod(Num#(MoisEcheance,'0') - Month($(vADSDateRef)) + 12, 12) <= $(vHorizonEcheanceMois), 'Oui', 'Non') AS EcheanceProche,
+DetecteurFuite,
+If(Year($(vADSDateRef)) - Year(Date#(DateEffet,'YYYY-MM-DD')) < $(vAncienClientT1), Dual('< $(vAncienClientT1) ans',1),
+ If(Year($(vADSDateRef)) - Year(Date#(DateEffet,'YYYY-MM-DD')) <= $(vAncienClientT2), Dual('$(vAncienClientT1) à $(vAncienClientT2) ans',2), Dual('> $(vAncienClientT2) ans',3))) AS AncienneteClient
+FROM [lib://ADS_PROTOTYPE_LOCAL/contrats_profil.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+
+SinistresDossiers:
+LOAD *,
+ If(Sin_Ouvert=1, If(Sin_AgeJours<$(vAgeRecentJ), Dual('< $(vAgeRecentJ) j',1), If(Sin_AgeJours<$(vAgeSurveilJ), Dual('$(vAgeRecentJ)–$(vAgeSurveilJ) j',2), If(Sin_AgeJours<$(vAgeAncienJ), Dual('$(vAgeSurveilJ)–$(vAgeAncienJ) j',3), Dual('> $(vAgeAncienJ) j',4)))), Null()) AS Sin_TrancheAge;
+LOAD MouvementID, Sin_Dossier,
+ Date(Date#(Sin_DateSurvenance,'YYYY-MM-DD')) AS Sin_DateSurvenance,
+ Date(Date#(Sin_DateDeclaration,'YYYY-MM-DD')) AS Sin_DateDeclaration,
+ If(Len(Sin_DateCloture)>0, Date(Date#(Sin_DateCloture,'YYYY-MM-DD'))) AS Sin_DateCloture,
+ Year(Date#(Sin_DateSurvenance,'YYYY-MM-DD')) AS Sin_AnneeSurvenance,
+ Date#(Sin_DateDeclaration,'YYYY-MM-DD') - Date#(Sin_DateSurvenance,'YYYY-MM-DD') AS Sin_DelaiDeclaration,
+ If(Len(Sin_DateCloture)>0, Date#(Sin_DateCloture,'YYYY-MM-DD') - Date#(Sin_DateDeclaration,'YYYY-MM-DD')) AS Sin_DureeGestion,
+ If(Len(Sin_DateCloture)=0, 1, 0) AS Sin_Ouvert,
+ If(Len(Sin_DateCloture)=0, $(vADSDateRef) - Date#(Sin_DateDeclaration,'YYYY-MM-DD')) AS Sin_AgeJours,
+ Sin_Statut, Sin_Cause,
+ Num#(Sin_Regle,'############0','.',',') AS Sin_Regle,
+ Num#(Sin_Provision,'############0','.',',') AS Sin_Provision,
+ Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') AS Sin_Charge,
+ If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') >= $(vSeuilGrave), 'Pointe (≥ ' & Num($(vSeuilGrave)/1000,'0') & ' k€)', 'Attritionnel') AS Sin_Severite,
+ If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 1000, Dual('< 1 k€',1),
+  If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 2000, Dual('1–2 k€',2),
+  If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 3500, Dual('2–3,5 k€',3),
+  If(Num#(Sin_Regle,'############0','.',',') + Num#(Sin_Provision,'############0','.',',') < 5000, Dual('3,5–5 k€',4), Dual('≥ 5 k€',5))))) AS Sin_TrancheCout,
+ Sin_Expertise, Sin_ConventionIRSI,
+ Num#(Sin_RecoursPotentiel,'############0','.',',') AS Sin_RecoursPotentiel,
+ Num#(Sin_RecoursEncaisse,'############0','.',',') AS Sin_RecoursEncaisse,
+ Sin_CanalDeclaration, Sin_Gestionnaire
+FROM [lib://ADS_PROTOTYPE_LOCAL/sinistres_dossiers.csv]
+(txt, utf8, embedded labels, delimiter is ',', msq);
+
+
+// ===== Volet GLI — garantie loyers impayés (données synthétiques) — 29/10/2026 =====
+// Clés : AgenceID (GLI_Baux -> Contrats), GLI_BailID, GLI_DossierID. Tous les autres champs sont préfixés GLI_.
+GLI_Baux:
+LOAD GLI_BailID, AgenceID, GLI_TypeBien, Num#(GLI_Loyer,'0') AS GLI_Loyer, GLI_Profil,
+ Num#(GLI_TauxEffort,'0.0','.',',') AS GLI_TauxEffort,
+ If(Num#(GLI_TauxEffort,'0.0','.',',')<$(vEffortT1),Dual('< $(vEffortT1) %',1),If(Num#(GLI_TauxEffort,'0.0','.',',')<=$(vEffortT2),Dual('$(vEffortT1)–$(vEffortT2) %',2),If(Num#(GLI_TauxEffort,'0.0','.',',')<=$(vEffortT3),Dual('$(vEffortT2)–$(vEffortT3) %',3),Dual('> $(vEffortT3) %',4)))) AS GLI_TrancheEffort,
+ Date(Date#(GLI_DateEffet,'YYYY-MM-DD')) AS GLI_DateEffet,
+ If(Len(GLI_DateFin)>0,Date(Date#(GLI_DateFin,'YYYY-MM-DD'))) AS GLI_DateFin,
+ If(Len(GLI_DateFin)=0 or Date#(GLI_DateFin,'YYYY-MM-DD')>$(vADSDateRef),'Actif','Terminé') AS GLI_StatutBail,
+ GLI_SuiviAuto
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_baux.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+GLI_Echeances:
+LOAD GLI_BailID,
+ Date(Date#(GLI_Echeance,'YYYY-MM-DD')) AS GLI_Echeance,
+ Date(MonthStart(Date#(GLI_Echeance,'YYYY-MM-DD')),'MMM YYYY') AS GLI_MoisEch,
+ Year(Date#(GLI_Echeance,'YYYY-MM-DD')) AS GLI_AnneeEch,
+ Num#(GLI_Du,'0') AS GLI_Du, Num#(GLI_Paye,'0') AS GLI_Paye, Num#(GLI_Du,'0')-Num#(GLI_Paye,'0') AS GLI_Impaye,
+ If(Len(GLI_JoursRetard)>0,Num#(GLI_JoursRetard,'0')) AS GLI_JoursRetard, GLI_Statut,
+ If(Match(GLI_Statut,'Retard','Partiel'),1,0) AS GLI_Signal,
+ If(MonthStart(Date#(GLI_Echeance,'YYYY-MM-DD'))>=MonthStart(AddMonths($(vADSDateRef),-2)),1,0) AS GLI_3DerniersMois,
+ If(MonthStart(Date#(GLI_Echeance,'YYYY-MM-DD'))>=MonthStart(AddMonths($(vADSDateRef),-5)),1,0) AS GLI_6DerniersMois
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_echeances.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+GLI_Dossiers:
+LOAD *,
+ If(GLI_Ouvert=1 and GLI_PiecesCompletes='Non',1,0) AS GLI_AlertePieces,
+ If(GLI_DelaiDetection>$(vGLIDetectJ),1,0) AS GLI_AlerteDetection,
+ If(GLI_DelaiDeclaration>$(vGLIDeclaJ) or (GLI_NbLoyersImpayes>=$(vGLINbLoyersDecla) and IsNull(GLI_DelaiDeclaration) and GLI_Ouvert=1 and GLI_AgeDossier>$(vGLIDeclaJ)),1,0) AS GLI_AlerteDeclaration;
+LOAD GLI_DossierID, GLI_BailID,
+ Date(Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DatePremierImpaye,
+ Date(MonthStart(Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')),'MMM YYYY') AS GLI_MoisPremierImpaye,
+ If(Len(GLI_DateDetection)>0,Date(Date#(GLI_DateDetection,'YYYY-MM-DD'))) AS GLI_DateDetection,
+ If(Len(GLI_DateDeclaration)>0,Date(Date#(GLI_DateDeclaration,'YYYY-MM-DD'))) AS GLI_DateDeclaration,
+ If(Len(GLI_DateIndemnisation)>0,Date(Date#(GLI_DateIndemnisation,'YYYY-MM-DD'))) AS GLI_DateIndemnisation,
+ If(Len(GLI_DateCloture)>0,Date(Date#(GLI_DateCloture,'YYYY-MM-DD'))) AS GLI_DateCloture,
+ If(Len(GLI_DateDetection)>0,Date#(GLI_DateDetection,'YYYY-MM-DD')-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DelaiDetection,
+ If(Len(GLI_DateDeclaration)>0,Date#(GLI_DateDeclaration,'YYYY-MM-DD')-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DelaiDeclaration,
+ If(Len(GLI_DateCloture)>0,Date#(GLI_DateCloture,'YYYY-MM-DD')-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_DureeTraitement,
+ If(Len(GLI_DateCloture)=0,1,0) AS GLI_Ouvert,
+ If(Len(GLI_DateCloture)=0,$(vADSDateRef)-Date#(GLI_DatePremierImpaye,'YYYY-MM-DD')) AS GLI_AgeDossier,
+ Num#(GLI_NbLoyersImpayes,'0') AS GLI_NbLoyersImpayes,
+ Num#(GLI_MontantImpaye,'0') AS GLI_MontantImpaye, Num#(GLI_MontantIndemnise,'0') AS GLI_MontantIndemnise,
+ Num#(GLI_MontantRecouvre,'0') AS GLI_MontantRecouvre,
+ If(Len(GLI_DateCloture)=0,Num#(GLI_MontantImpaye,'0')-Num#(GLI_MontantRecouvre,'0')) AS GLI_Encours,
+ GLI_PiecesCompletes, If(Len(GLI_PieceManquante)>0,GLI_PieceManquante) AS GLI_PieceManquante,
+ GLI_EtapeActuelle, GLI_Procedure, GLI_SignalPrealable, GLI_Gestionnaire
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_dossiers.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+GLI_Etapes:
+LOAD GLI_DossierID, Num#(GLI_EtapeOrdre,'0') AS GLI_EtapeOrdre,
+ Dual(GLI_Etape, Match(GLI_Etape,'Premier impayé','Détection et relance amiable','Mise en demeure','Commandement de payer','Déclaration à l’assureur','Indemnisation','Procédure d’expulsion','Recouvrement','Régularisation','Clôture')) AS GLI_Etape,
+ Date(Date#(GLI_DateEtape,'YYYY-MM-DD')) AS GLI_DateEtape
+FROM [lib://ADS_PROTOTYPE_LOCAL/gli_etapes.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+// Signaux précoces par bail (règles métier explicites, sans IA) sur les échéances récentes
+TmpSig:
+LOAD GLI_BailID,
+ Sum(If(GLI_3DerniersMois=1,GLI_Signal)) AS GLI_Retards3M,
+ Sum(If(GLI_6DerniersMois=1 and GLI_Statut='Partiel',1)) AS GLI_Partiels6M,
+ Avg(If(GLI_3DerniersMois=1,GLI_JoursRetard)) AS GLI_RetardMoyen3M,
+ Sum(If(GLI_3DerniersMois=1 and GLI_Statut='Impayé',1)) AS GLI_Impayes3M
+RESIDENT GLI_Echeances GROUP BY GLI_BailID;
+LEFT JOIN (GLI_Baux) LOAD * RESIDENT TmpSig; DROP TABLE TmpSig;
+LEFT JOIN (GLI_Baux)
+LOAD GLI_BailID,
+ RangeMin(Alt(GLI_Retards3M,0),$(vGLIMaxRetards))*$(vGLIPtsRetard) + RangeMin(Alt(GLI_Partiels6M,0),1)*$(vGLIPtsPartiel) + If(GLI_TauxEffort>$(vGLISeuilEffort),$(vGLIPtsEffort),0)
+ + If(Match(GLI_Profil,'CDD / intérim','Indépendant'),$(vGLIPtsProfil),0) + If(Alt(GLI_RetardMoyen3M,0)>$(vGLISeuilRetardMoyenJ),$(vGLIPtsRetardMoyen),0) AS GLI_ScoreVigilance
+RESIDENT GLI_Baux;
+GLI_Niveaux:
+LOAD GLI_BailID,
+ If(Alt(GLI_Impayes3M,0)>0,Dual('En impayé',4),If(GLI_ScoreVigilance>=$(vGLIVigilanceElevee),Dual('Vigilance élevée',3),If(GLI_ScoreVigilance>=$(vGLIVigilanceModeree),Dual('Vigilance modérée',2),Dual('Sans signal',1)))) AS GLI_Vigilance
+RESIDENT GLI_Baux WHERE GLI_StatutBail='Actif';
+
+
+// Nombre de sinistres par contrat (règle de suspicion explicable)
+TmpNb: LOAD ContratID, Count(MouvementID) AS Contrat_NbSinistres RESIDENT Mouvements WHERE TypeMouvement='SINISTRE' GROUP BY ContratID;
+LEFT JOIN (Contrats) LOAD * RESIDENT TmpNb; DROP TABLE TmpNb;
+
+// ===== Couche IA et gouvernance — VELORIAX ASSURANCE LABS — 04/11/2026 =====
+// Scores produits hors Qlik par ia/modeles.py et ia/plan_action.py (modèles validés sur une période jamais vue).
+// Données 100 % synthétiques. Un score est une probabilité, pas une certitude. L'humain décide.
+IA_PreventionDDE:
+LOAD ContratID,
+ Num#(IA_ProbaDDE,'0.0000','.',',') AS IA_ProbaDDE,
+ Num#(IA_ChargeDDEAttendue,'0.0000','.',',') AS IA_ChargeDDEAttendue,
+ Num#(IA_RangDDE,'0') AS IA_RangDDE,
+ Dual(IA_NiveauDDE, Match(IA_NiveauDDE,'Élevé','Modéré','Faible')) AS IA_NiveauDDE,
+ IA_MotifDDE
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_prevention_dde.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_CoutFinal:
+LOAD MouvementID,
+ Num#(IA_CoutFinal,'0.0','.',',') AS IA_CoutFinal,
+ Num#(IA_CoutBas,'0.0','.',',') AS IA_CoutBas,
+ Num#(IA_CoutHaut,'0.0','.',',') AS IA_CoutHaut,
+ Num#(IA_EcartProvision,'0.0','.',',') AS IA_EcartProvision,
+ IA_AlerteProvision, IA_Explication
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_cout_final.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_GLI:
+LOAD GLI_BailID,
+ Num#(IA_ProbaImpaye90j,'0.0000','.',',') AS IA_ProbaImpaye90j,
+ Num#(IA_RangImpaye,'0') AS IA_RangImpaye,
+ Dual(IA_NiveauImpaye, Match(IA_NiveauImpaye,'Alerte','À surveiller','Sans alerte')) AS IA_NiveauImpaye,
+ IA_MotifImpaye,
+ Num#(IA_LoyersExposes,'0.0000','.',',') AS IA_LoyersExposes
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_gli_impaye.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+// Tables isolées (aucune association) : plan, projection, tâches, gouvernance
+IA_Plan:
+LOAD Act_ID, Act_Action, Act_Volet, Act_Responsable, Act_Cible, Num#(Act_Nb,'0') AS Act_Nb, Act_Hypothese, Act_KPI,
+ Num#(Act_Effet_P10,'0','.',',') AS Act_Effet_P10, Num#(Act_Effet_P50,'0','.',',') AS Act_Effet_P50,
+ Num#(Act_Effet_P90,'0','.',',') AS Act_Effet_P90, Num#(Act_Points_SP,'0.00','.',',') AS Act_Points_SP
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_plan_actions.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_Projection:
+LOAD Dual(Date(Date#(Proj_Mois,'YYYY-MM'),'MMM YYYY'), Num#(Proj_Ordre,'0')) AS Proj_Mois,
+ Proj_Scenario,
+ Num#(Proj_P10,'0.0000','.',',') AS Proj_P10, Num#(Proj_P50,'0.0000','.',',') AS Proj_P50,
+ Num#(Proj_P90,'0.0000','.',',') AS Proj_P90
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_projection.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_Taches:
+LOAD Tache_Action, Tache_Objet, Tache_Libelle, Tache_Motif,
+ Num#(Tache_Priorite,'0.0000','.',',') AS Tache_Priorite, Num#(Tache_Rang,'0') AS Tache_Rang
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_taches.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+Gouv_KPI:
+LOAD Gouv_ID, Gouv_Nom, Gouv_Definition, Gouv_Regle, Gouv_Unite, Gouv_Proprietaire, Gouv_Volet, Gouv_Seuil,
+ Gouv_Controle, Gouv_Qlik, Gouv_Sens
+FROM [lib://ADS_PROTOTYPE_LOCAL/gouv_kpi.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+Gouv_Modeles:
+LOAD Mod_ID, Mod_Nom, Mod_Version, Mod_Type, Mod_Question, Mod_Donnees, Mod_Validation, Mod_Usage, Mod_Limites
+FROM [lib://ADS_PROTOTYPE_LOCAL/gouv_modeles.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+// ===== fin couche IA =====
+
+// Durée du script de chargement ; hors sauvegarde QVF.
+LET vADSReloadSeconds = Num(86400*(Now(1)-$(vADSReloadStarted)), '0.000', '.', '');
+

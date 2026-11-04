@@ -1,0 +1,33 @@
+{
+ "sauvegarde": "./backups/avant-ia-20261104T163523",
+ "primes": "31840000",
+ "charges": "22465000",
+ "contrats_scores": "12000",
+ "provisions_insuffisantes": "79",
+ "baux_alerte": "204",
+ "actions": "5",
+ "taches": "705",
+ "kpi_gouvernes": "12",
+ "tables": [
+  "Mouvements",
+  "ControlesSource",
+  "CRMClients",
+  "CRMEvenements",
+  "SinistresDossiers",
+  "GLI_Echeances",
+  "GLI_Dossiers",
+  "GLI_Etapes",
+  "GLI_Baux",
+  "GLI_Niveaux",
+  "Contrats",
+  "IA_PreventionDDE",
+  "IA_CoutFinal",
+  "IA_GLI",
+  "IA_Plan",
+  "IA_Projection",
+  "IA_Taches",
+  "Gouv_KPI",
+  "Gouv_Modeles"
+ ],
+ "cles_synthetiques": []
+}

@@ -1,0 +1,58 @@
+// ===== Couche IA et gouvernance — VELORIAX ASSURANCE LABS — 04/11/2026 =====
+// Scores produits hors Qlik par ia/modeles.py et ia/plan_action.py (modèles validés sur une période jamais vue).
+// Données 100 % synthétiques. Un score est une probabilité, pas une certitude. L'humain décide.
+IA_PreventionDDE:
+LOAD ContratID,
+ Num#(IA_ProbaDDE,'0.0000','.',',') AS IA_ProbaDDE,
+ Num#(IA_ChargeDDEAttendue,'0.0000','.',',') AS IA_ChargeDDEAttendue,
+ Num#(IA_RangDDE,'0') AS IA_RangDDE,
+ Dual(IA_NiveauDDE, Match(IA_NiveauDDE,'Élevé','Modéré','Faible')) AS IA_NiveauDDE,
+ IA_MotifDDE
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_prevention_dde.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_CoutFinal:
+LOAD MouvementID,
+ Num#(IA_CoutFinal,'0.0','.',',') AS IA_CoutFinal,
+ Num#(IA_CoutBas,'0.0','.',',') AS IA_CoutBas,
+ Num#(IA_CoutHaut,'0.0','.',',') AS IA_CoutHaut,
+ Num#(IA_EcartProvision,'0.0','.',',') AS IA_EcartProvision,
+ IA_AlerteProvision, IA_Explication
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_cout_final.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_GLI:
+LOAD GLI_BailID,
+ Num#(IA_ProbaImpaye90j,'0.0000','.',',') AS IA_ProbaImpaye90j,
+ Num#(IA_RangImpaye,'0') AS IA_RangImpaye,
+ Dual(IA_NiveauImpaye, Match(IA_NiveauImpaye,'Alerte','À surveiller','Sans alerte')) AS IA_NiveauImpaye,
+ IA_MotifImpaye,
+ Num#(IA_LoyersExposes,'0.0000','.',',') AS IA_LoyersExposes
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_gli_impaye.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+// Tables isolées (aucune association) : plan, projection, tâches, gouvernance
+IA_Plan:
+LOAD Act_ID, Act_Action, Act_Volet, Act_Responsable, Act_Cible, Num#(Act_Nb,'0') AS Act_Nb, Act_Hypothese, Act_KPI,
+ Num#(Act_Effet_P10,'0','.',',') AS Act_Effet_P10, Num#(Act_Effet_P50,'0','.',',') AS Act_Effet_P50,
+ Num#(Act_Effet_P90,'0','.',',') AS Act_Effet_P90, Num#(Act_Points_SP,'0.00','.',',') AS Act_Points_SP
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_plan_actions.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_Projection:
+LOAD Dual(Date(Date#(Proj_Mois,'YYYY-MM'),'MMM YYYY'), Num#(Proj_Ordre,'0')) AS Proj_Mois,
+ Proj_Scenario,
+ Num#(Proj_P10,'0.0000','.',',') AS Proj_P10, Num#(Proj_P50,'0.0000','.',',') AS Proj_P50,
+ Num#(Proj_P90,'0.0000','.',',') AS Proj_P90
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_projection.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+IA_Taches:
+LOAD Tache_Action, Tache_Objet, Tache_Libelle, Tache_Motif,
+ Num#(Tache_Priorite,'0.0000','.',',') AS Tache_Priorite, Num#(Tache_Rang,'0') AS Tache_Rang
+FROM [lib://ADS_PROTOTYPE_LOCAL/ia_taches.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+Gouv_KPI:
+LOAD Gouv_ID, Gouv_Nom, Gouv_Definition, Gouv_Regle, Gouv_Unite, Gouv_Proprietaire, Gouv_Volet, Gouv_Seuil,
+ Gouv_Controle, Gouv_Qlik, Gouv_Sens
+FROM [lib://ADS_PROTOTYPE_LOCAL/gouv_kpi.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+
+Gouv_Modeles:
+LOAD Mod_ID, Mod_Nom, Mod_Version, Mod_Type, Mod_Question, Mod_Donnees, Mod_Validation, Mod_Usage, Mod_Limites
+FROM [lib://ADS_PROTOTYPE_LOCAL/gouv_modeles.csv] (txt, utf8, embedded labels, delimiter is ',', msq);
+// ===== fin couche IA =====

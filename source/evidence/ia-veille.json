@@ -1,0 +1,52 @@
+{
+ "jour": "2026-11-04",
+ "alertes": [
+  {
+   "id": "V1",
+   "nom": "S/P glissant 12 mois au-dessus de la cible",
+   "seuil": 0.03,
+   "unite": "points",
+   "responsable": "Direction technique",
+   "valeur": 0.06359999999999999,
+   "texte": "S/P glissant 12 mois 74,4 % pour une cible de 68,0 % ; le pire écart régional est Auvergne-Rhône-Alpes (441 760 €).",
+   "declenchee": true
+  },
+  {
+   "id": "V2",
+   "nom": "Dégâts des eaux > 35 % de la charge de l’année",
+   "seuil": 0.35,
+   "responsable": "Direction prévention",
+   "valeur": 0.39799999999999996,
+   "texte": "Les dégâts des eaux pèsent 39,8 % de la charge 2026 ; l’action A1 cible les contrats sans détecteur.",
+   "declenchee": true
+  },
+  {
+   "id": "V3",
+   "nom": "Provisions probablement insuffisantes",
+   "seuil": 50,
+   "responsable": "Direction indemnisation",
+   "valeur": 79,
+   "texte": "79 dossiers sous-provisionnés (complément 74 566 €) ; 8 règlements atypiques.",
+   "declenchee": true
+  },
+  {
+   "id": "V4",
+   "nom": "Recours à encaisser",
+   "seuil": 300000,
+   "responsable": "Service recours",
+   "valeur": 588047,
+   "texte": "455 dossiers des 12 derniers mois : 588 047 € à encaisser. Effet médian 68 694 € sur 3 mois si les relances partent cette semaine.",
+   "declenchee": true
+  },
+  {
+   "id": "V5",
+   "nom": "Baux GLI en alerte d’impayé",
+   "seuil": 150,
+   "responsable": "Gestion GLI",
+   "valeur": 204,
+   "texte": "204 baux en alerte, 33 768 € de loyers exposés.",
+   "declenchee": true
+  }
+ ],
+ "resume": "5 signaux sur 5 demandent une décision : V1 S/P glissant 12 mois au-dessus de la cible (Direction technique) ; V2 Dégâts des eaux > 35 % de la charge de l’année (Direction prévention) ; V3 Provisions probablement insuffisantes (Direction indemnisation) ; V4 Recours à encaisser (Service recours) ; V5 Baux GLI en alerte d’impayé (Gestion GLI). À lancer d’abord : A3 · Relancer les recours non encaissés et A1 · Prévenir les dégâts des eaux. Contrôles de chargement conformes."
+}
