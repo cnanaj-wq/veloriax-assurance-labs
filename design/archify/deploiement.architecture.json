@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Déploiement : du poste local à Qlik Cloud et à Claude",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1180,
+      640
+    ],
+    "views": [
+      {
+        "id": "deploiement",
+        "label": "Mise en ligne Qlik Cloud",
+        "focus": [
+          "desktop",
+          "app",
+          "datafiles",
+          "ext"
+        ],
+        "note": "L'application, ses 19 CSV et son extension importés par l'API du tenant."
+      },
+      {
+        "id": "copilote_local",
+        "label": "Copilote local (onglet 14)",
+        "focus": [
+          "desktop",
+          "pont",
+          "ollama"
+        ],
+        "note": "En local, l'onglet 14 interroge un pont en lecture seule et un LLM local."
+      },
+      {
+        "id": "mcp",
+        "label": "Claude via Qlik MCP",
+        "focus": [
+          "claude",
+          "qmcp",
+          "app"
+        ],
+        "note": "Claude s'authentifie en OAuth (CIMD) et interroge l'application dans Qlik Cloud."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "desktop",
+      "type": "frontend",
+      "label": "Qlik Sense Desktop",
+      "sublabel": "QVF · data_prototype",
+      "pos": [
+        60,
+        140
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "pont",
+      "type": "backend",
+      "label": "Pont copilote",
+      "sublabel": ":8787 · 7 outils",
+      "pos": [
+        60,
+        340
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "lecture seule"
+    },
+    {
+      "id": "ollama",
+      "type": "backend",
+      "label": "LLM local",
+      "sublabel": "Ollama qwen2.5:3b",
+      "pos": [
+        60,
+        520
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "Assurance Decision Studio",
+      "sublabel": "15 onglets",
+      "pos": [
+        400,
+        140
+      ],
+      "size": [
+        190,
+        64
+      ],
+      "tag": "espace perso"
+    },
+    {
+      "id": "datafiles",
+      "type": "database",
+      "label": "DataFiles",
+      "sublabel": "19 CSV synthétiques",
+      "pos": [
+        400,
+        340
+      ],
+      "size": [
+        190,
+        64
+      ]
+    },
+    {
+      "id": "ext",
+      "type": "frontend",
+      "label": "Extension veoriax-labs",
+      "sublabel": "49 objets",
+      "pos": [
+        660,
+        340
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "qmcp",
+      "type": "cloud",
+      "label": "Qlik MCP",
+      "sublabel": "/api/ai/mcp",
+      "pos": [
+        660,
+        140
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "tag": "rôle Qlik MCP"
+    },
+    {
+      "id": "claude",
+      "type": "external",
+      "label": "Claude",
+      "sublabel": "connecteur Qlik",
+      "pos": [
+        960,
+        140
+      ],
+      "size": [
+        160,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Poste local",
+      "wraps": [
+        "desktop",
+        "pont",
+        "ollama"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Qlik Cloud · tenant fr",
+      "wraps": [
+        "app",
+        "datafiles",
+        "ext",
+        "qmcp"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "desktop",
+      "to": "app",
+      "label": "import QVF",
+      "variant": "emphasis"
+    },
+    {
+      "from": "desktop",
+      "to": "datafiles",
+      "label": "19 CSV"
+    },
+    {
+      "from": "datafiles",
+      "to": "app",
+      "label": "rechargement"
+    },
+    {
+      "from": "ext",
+      "to": "app",
+      "label": "visuels"
+    },
+    {
+      "from": "qmcp",
+      "to": "app",
+      "label": "outils qlik_*"
+    },
+    {
+      "from": "claude",
+      "to": "qmcp",
+      "label": "OAuth CIMD",
+      "variant": "security"
+    },
+    {
+      "from": "desktop",
+      "to": "pont",
+      "label": "onglet 14",
+      "labelAt": [
+        186,
+        272
+      ]
+    },
+    {
+      "from": "pont",
+      "to": "ollama",
+      "label": "reformule",
+      "variant": "dashed",
+      "labelAt": [
+        186,
+        462
+      ]
+    }
+  ]
+}

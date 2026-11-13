@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Parcours des 15 onglets : du signal à la décision",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "decision",
+        "label": "Le fil de la décision",
+        "focus": [
+          "accueil",
+          "decider",
+          "comprendre",
+          "simuler",
+          "anticiper",
+          "copiloter"
+        ],
+        "note": "Six onglets suffisent pour passer de l'écart au plan d'action."
+      },
+      {
+        "id": "metiers",
+        "label": "Les zooms métier",
+        "focus": [
+          "decider",
+          "comprendre",
+          "simuler",
+          "iard",
+          "gli",
+          "contexte"
+        ],
+        "note": "Sinistres, renouvellement, loyers impayés, temps et territoire."
+      },
+      {
+        "id": "confiance",
+        "label": "La confiance",
+        "focus": [
+          "fiabiliser",
+          "decider",
+          "anticiper",
+          "preuves"
+        ],
+        "note": "Chiffres contrôlés à l'entrée, preuves exigées avant de croire l'IA."
+      }
+    ],
+    "viewBox": [
+      960,
+      600
+    ]
+  },
+  "lanes": [
+    {
+      "id": "fil",
+      "label": "Voir et agir"
+    },
+    {
+      "id": "analyse",
+      "label": "Comprendre et anticiper"
+    },
+    {
+      "id": "zoom",
+      "label": "Zooms métier"
+    },
+    {
+      "id": "preuve",
+      "label": "Contexte et confiance"
+    }
+  ],
+  "phases": [
+    {
+      "id": "observer",
+      "label": "Observer",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "comprendre_ph",
+      "label": "Comprendre · simuler",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "anticiper_ph",
+      "label": "Anticiper · agir",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "accueil",
+    "decider",
+    "comprendre",
+    "simuler",
+    "anticiper",
+    "copiloter"
+  ],
+  "nodes": [
+    {
+      "id": "accueil",
+      "lane": "fil",
+      "col": 0,
+      "type": "frontend",
+      "label": "Accueil",
+      "sublabel": "4 KPI"
+    },
+    {
+      "id": "decider",
+      "lane": "fil",
+      "col": 1,
+      "type": "frontend",
+      "label": "01 Décider",
+      "sublabel": "S/P 70,6 % · cible 68",
+      "tag": "+814 k€"
+    },
+    {
+      "id": "comprendre",
+      "lane": "analyse",
+      "col": 2,
+      "type": "backend",
+      "label": "02 Comprendre",
+      "sublabel": "charge par garantie"
+    },
+    {
+      "id": "simuler",
+      "lane": "fil",
+      "col": 3,
+      "type": "backend",
+      "label": "05 Simuler",
+      "sublabel": "levier dégâts des eaux"
+    },
+    {
+      "id": "anticiper",
+      "lane": "analyse",
+      "col": 4,
+      "type": "cloud",
+      "label": "13 Anticiper",
+      "sublabel": "scores · fourchettes"
+    },
+    {
+      "id": "copiloter",
+      "lane": "fil",
+      "col": 5,
+      "type": "cloud",
+      "label": "14 Copiloter",
+      "sublabel": "questions via MCP"
+    },
+    {
+      "id": "iard",
+      "lane": "zoom",
+      "col": 2,
+      "type": "database",
+      "label": "03 · 04",
+      "sublabel": "sinistres · contrats"
+    },
+    {
+      "id": "contexte",
+      "lane": "preuve",
+      "col": 3,
+      "type": "external",
+      "label": "08 · 09",
+      "sublabel": "mois · territoires"
+    },
+    {
+      "id": "gli",
+      "lane": "zoom",
+      "col": 4,
+      "type": "database",
+      "label": "06 · 07",
+      "sublabel": "loyers impayés"
+    },
+    {
+      "id": "fiabiliser",
+      "lane": "preuve",
+      "col": 1,
+      "type": "security",
+      "label": "10 Fiabiliser",
+      "sublabel": "8 contrôles"
+    },
+    {
+      "id": "preuves",
+      "lane": "preuve",
+      "col": 5,
+      "type": "security",
+      "label": "11 · 12",
+      "sublabel": "preuves · parcours"
+    }
+  ],
+  "edges": [
+    {
+      "from": "accueil",
+      "to": "decider",
+      "role": "main"
+    },
+    {
+      "from": "decider",
+      "to": "comprendre",
+      "role": "main",
+      "label": "où ?",
+      "labelDx": 44
+    },
+    {
+      "from": "comprendre",
+      "to": "simuler",
+      "role": "main",
+      "label": "levier"
+    },
+    {
+      "from": "simuler",
+      "to": "anticiper",
+      "role": "main"
+    },
+    {
+      "from": "anticiper",
+      "to": "copiloter",
+      "role": "main"
+    },
+    {
+      "from": "comprendre",
+      "to": "iard",
+      "role": "branch"
+    },
+    {
+      "from": "simuler",
+      "to": "contexte",
+      "role": "branch",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "straight"
+    },
+    {
+      "from": "anticiper",
+      "to": "gli",
+      "role": "branch"
+    },
+    {
+      "from": "fiabiliser",
+      "to": "decider",
+      "role": "async",
+      "label": "contrôlé",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "route": "straight"
+    },
+    {
+      "from": "copiloter",
+      "to": "preuves",
+      "role": "async",
+      "label": "preuve"
+    }
+  ]
+}

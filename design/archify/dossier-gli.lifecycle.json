@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Cycle de vie d'un dossier de loyers impayés (GLI)",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "amiable",
+        "label": "Voie amiable",
+        "focus": [
+          "impaye",
+          "relance",
+          "demeure",
+          "regul",
+          "cloture"
+        ],
+        "note": "Un seul loyer impayé : relance, mise en demeure, puis régularisation."
+      },
+      {
+        "id": "assurance",
+        "label": "Voie assurance",
+        "focus": [
+          "demeure",
+          "commandement",
+          "declaration",
+          "indemnisation",
+          "recouvrement",
+          "cloture"
+        ],
+        "note": "Deux loyers ou plus : commandement, déclaration, indemnisation, recouvrement."
+      },
+      {
+        "id": "expulsion",
+        "label": "Cas lourd",
+        "focus": [
+          "indemnisation",
+          "expulsion"
+        ],
+        "note": "Six loyers ou plus : une procédure d'expulsion peut suivre l'indemnisation."
+      }
+    ],
+    "viewBox": [
+      1080,
+      650
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Étapes du dossier"
+    },
+    {
+      "id": "evenements",
+      "label": "Règlement"
+    },
+    {
+      "id": "terminal",
+      "label": "Issue"
+    }
+  ],
+  "states": [
+    {
+      "id": "impaye",
+      "type": "start",
+      "label": "Premier impayé",
+      "sublabel": "échéance non payée",
+      "lane": "main",
+      "col": 0,
+      "step": "01"
+    },
+    {
+      "id": "relance",
+      "type": "active",
+      "label": "Relance amiable",
+      "sublabel": "détection",
+      "lane": "main",
+      "col": 1,
+      "step": "02"
+    },
+    {
+      "id": "demeure",
+      "type": "active",
+      "label": "Mise en demeure",
+      "sublabel": "8 à 15 j après",
+      "lane": "main",
+      "col": 2,
+      "step": "03"
+    },
+    {
+      "id": "commandement",
+      "type": "decision",
+      "label": "Commandement",
+      "sublabel": "2 loyers ou plus",
+      "lane": "main",
+      "col": 3,
+      "step": "04"
+    },
+    {
+      "id": "declaration",
+      "type": "waiting",
+      "label": "Déclaration",
+      "sublabel": "à l'assureur",
+      "lane": "main",
+      "col": 4,
+      "tag": "pièces",
+      "step": "05"
+    },
+    {
+      "id": "indemnisation",
+      "type": "active",
+      "label": "Indemnisation",
+      "sublabel": "85 à 100 % du dû",
+      "lane": "evenements",
+      "col": 2,
+      "step": "06",
+      "width": 108
+    },
+    {
+      "id": "recouvrement",
+      "type": "active",
+      "label": "Recouvrement",
+      "sublabel": "15 à 70 % récupéré",
+      "lane": "evenements",
+      "col": 1,
+      "step": "07",
+      "width": 108
+    },
+    {
+      "id": "expulsion",
+      "type": "neutral",
+      "label": "Expulsion",
+      "sublabel": "6 loyers ou plus",
+      "lane": "terminal",
+      "col": 2,
+      "tag": "cas lourd"
+    },
+    {
+      "id": "regul",
+      "type": "active",
+      "label": "Régularisation",
+      "sublabel": "1 seul loyer",
+      "lane": "evenements",
+      "col": 0,
+      "width": 108
+    },
+    {
+      "id": "cloture",
+      "type": "success",
+      "label": "Clôture",
+      "sublabel": "dossier soldé",
+      "lane": "terminal",
+      "col": 0
+    }
+  ],
+  "transitions": [
+    {
+      "from": "impaye",
+      "to": "relance"
+    },
+    {
+      "from": "relance",
+      "to": "demeure"
+    },
+    {
+      "from": "demeure",
+      "to": "commandement",
+      "label": "≥ 2 loyers",
+      "labelAt": [
+        479,
+        118
+      ]
+    },
+    {
+      "from": "commandement",
+      "to": "declaration"
+    },
+    {
+      "from": "declaration",
+      "to": "indemnisation"
+    },
+    {
+      "from": "indemnisation",
+      "to": "recouvrement"
+    },
+    {
+      "from": "indemnisation",
+      "to": "expulsion",
+      "variant": "dashed"
+    },
+    {
+      "from": "recouvrement",
+      "to": "cloture"
+    },
+    {
+      "from": "demeure",
+      "to": "regul",
+      "label": "1 loyer",
+      "labelAt": [
+        402,
+        206
+      ]
+    },
+    {
+      "from": "regul",
+      "to": "cloture"
+    }
+  ]
+}

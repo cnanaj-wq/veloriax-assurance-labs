@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Schémas et écrans · Veloriax</title>
+<meta name="description" content="Schémas interactifs du démonstrateur Veloriax Assurance Labs (parcours des onglets, flux de données, cycle GLI, copilote, déploiement) et captures des 15 onglets de l'application Qlik Sense.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .retour { color: #c9d2da; font-size: var(--t-s); text-decoration: none; display: inline-block; margin: var(--e-3) 0 var(--e-4); }
+  .retour:hover { color: #fff; text-decoration: underline; }
+  .bandeau-titre { padding-bottom: var(--e-2); }
+  .contenu { max-width: 1200px; margin: 0 auto; padding: var(--e-5) var(--e-4) var(--e-6); }
+  .section + .section { margin-top: var(--e-6); }
+  .section h2 { font-size: var(--t-xl); color: var(--encre); }
+  .section > p { color: var(--texte-2); margin-top: var(--e-2); max-width: 72ch; }
+  .grille { display: grid; gap: var(--e-4); margin-top: var(--e-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); }
+  .schema { display: flex; flex-direction: column; gap: var(--e-2); background: var(--carte); border: 1px solid var(--trait); border-top: 4px solid var(--sarcelle); border-radius: var(--rayon); padding: var(--e-4) var(--e-5) var(--e-5); box-shadow: var(--ombre); color: inherit; text-decoration: none; transition: transform var(--duree) ease, box-shadow var(--duree) ease, border-color var(--duree) ease; }
+  .schema:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(15, 44, 68, 0.12); border-top-color: var(--orange); }
+  .schema__type { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sarcelle); }
+  .schema h3 { font-size: var(--t-l); color: var(--encre); }
+  .schema p { color: var(--texte-2); font-size: var(--t-s); }
+  .schema__ouvrir { margin-top: auto; padding-top: var(--e-2); font-weight: 700; font-size: var(--t-s); color: var(--orange); }
+  .note { font-size: var(--t-s); color: var(--texte-3); margin-top: var(--e-4); }
+  .ecrans { display: grid; gap: var(--e-5); margin-top: var(--e-5); grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); }
+  .ecran { margin: 0; background: var(--carte); border: 1px solid var(--trait); border-radius: var(--rayon); overflow: hidden; box-shadow: var(--ombre); }
+  .ecran a { display: block; }
+  .ecran img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; background: var(--fond); }
+  .ecran figcaption { padding: var(--e-3) var(--e-4) var(--e-4); }
+  .ecran figcaption strong { display: block; color: var(--encre); }
+  .ecran figcaption span { font-size: var(--t-s); color: var(--texte-2); }
+  @media (prefers-reduced-motion: reduce) { .schema { transition: none; } .schema:hover { transform: none; } }
+</style>
+</head>
+<body>
+<a class="evitement" href="#contenu">Aller au contenu</a>
+
+<header class="bandeau-titre">
+  <div class="bandeau-titre__texte">
+    <h1>Schémas et écrans</h1>
+    <p>Comment les 15 onglets s'enchaînent, d'où viennent les données, comment répond le copilote</p>
+  </div>
+  <a class="retour" href="../">← Retour au dashboard</a>
+</header>
+
+<p class="avertissement">Démonstrateur sur données synthétiques. Aucun chiffre ne provient d'un assureur réel ; aucun modèle n'est validé en production.</p>
+
+<main id="contenu" class="contenu">
+  <section class="section" aria-labelledby="titre-schemas">
+    <h2 id="titre-schemas">Cinq schémas interactifs</h2>
+    <p>Chaque schéma s'ouvre dans une page autonome : zoom, recherche, vues guidées, thème clair ou sombre, export en image.</p>
+    <div class="grille">
+      <a class="schema" href="parcours-onglets.html">
+        <span class="schema__type">Parcours</span>
+        <h3>Les 15 onglets, du signal à la décision</h3>
+        <p>Accueil → Décider → Comprendre → Simuler → Anticiper → Copiloter, avec les zooms métier, le contexte et les onglets de confiance.</p>
+        <span class="schema__ouvrir">Ouvrir le schéma →</span>
+      </a>
+      <a class="schema" href="donnees.html">
+        <span class="schema__type">Flux de données</span>
+        <h3>Des données synthétiques aux onglets</h3>
+        <p>Trois générateurs Python, 11 fichiers sources, l'enrichissement IA, 19 fichiers rechargés, 8 contrôles, puis la restitution.</p>
+        <span class="schema__ouvrir">Ouvrir le schéma →</span>
+      </a>
+      <a class="schema" href="dossier-gli.html">
+        <span class="schema__type">Cycle de vie</span>
+        <h3>Un dossier de loyers impayés</h3>
+        <p>Du premier impayé à la clôture : voie amiable, voie assurance (commandement, déclaration, indemnisation, recouvrement) et cas lourd.</p>
+        <span class="schema__ouvrir">Ouvrir le schéma →</span>
+      </a>
+      <a class="schema" href="copilote.html">
+        <span class="schema__type">Séquence</span>
+        <h3>Une question au copilote</h3>
+        <p>Règles d'abord, outils en lecture seule pour les chiffres, documents approuvés sinon ; le texte est rejeté si un chiffre n'est pas sourcé.</p>
+        <span class="schema__ouvrir">Ouvrir le schéma →</span>
+      </a>
+      <a class="schema" href="deploiement.html">
+        <span class="schema__type">Architecture</span>
+        <h3>Du poste local à Qlik Cloud et à Claude</h3>
+        <p>Qlik Sense Desktop et le pont local, l'application importée dans Qlik Cloud, Claude relié par le connecteur Qlik MCP.</p>
+        <span class="schema__ouvrir">Ouvrir le schéma →</span>
+      </a>
+    </div>
+    <p class="note">Les libellés de l'interface du lecteur (« Guided views », « Legend »…) restent en anglais.</p>
+  </section>
+
+  <section class="section" aria-labelledby="titre-ecrans">
+    <h2 id="titre-ecrans">Les 15 onglets de l'application Qlik Sense</h2>
+    <p>Captures de l'application sur données synthétiques. Cliquer sur une capture l'ouvre en taille réelle.</p>
+    <div class="ecrans">
+      <figure class="ecran"><a href="../img/onglets/00-accueil.jpg"><img src="../img/onglets/00-accueil.jpg" alt="Accueil : primes, charges, S/P 70,6 % pour une cible de 68 %, 12 000 contrats" loading="lazy" width="1600" height="811"></a><figcaption><strong>Accueil</strong><span>Les quatre chiffres du portefeuille.</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/01-decider.jpg"><img src="../img/onglets/01-decider.jpg" alt="01 Décider : S/P par région, écart à la cible de 814 k€" loading="lazy"></a><figcaption><strong>01 · Décider</strong><span>Où est l'écart à la cible et que faut-il décider ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/02-comprendre.jpg"><img src="../img/onglets/02-comprendre.jpg" alt="02 Comprendre : charges par garantie, dégâts des eaux en tête" loading="lazy"></a><figcaption><strong>02 · Comprendre</strong><span>Quelle garantie forme la charge ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/03-indemniser.jpg"><img src="../img/onglets/03-indemniser.jpg" alt="03 Indemniser : dossiers ouverts, délais, recours, score de suspicion" loading="lazy"></a><figcaption><strong>03 · Indemniser</strong><span>Quels dossiers bloquent ou coûtent le plus ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/04-renouveler.jpg"><img src="../img/onglets/04-renouveler.jpg" alt="04 Renouveler : S/P par activité, agences, contrats à revoir avant échéance" loading="lazy"></a><figcaption><strong>04 · Renouveler</strong><span>Quels contrats revoir avant l'échéance ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/05-simuler.jpg"><img src="../img/onglets/05-simuler.jpg" alt="05 Simuler : réduction hypothétique des dégâts des eaux et S/P simulé" loading="lazy"></a><figcaption><strong>05 · Simuler</strong><span>Un levier de prévention suffit-il ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/06-prevenir.jpg"><img src="../img/onglets/06-prevenir.jpg" alt="06 Prévenir : baux GLI en vigilance, score explicable, baux à appeler" loading="lazy"></a><figcaption><strong>06 · Prévenir</strong><span>Quels baux GLI risquent l'impayé ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/07-recouvrer.jpg"><img src="../img/onglets/07-recouvrer.jpg" alt="07 Recouvrer : parcours des dossiers d'impayés étape par étape" loading="lazy"></a><figcaption><strong>07 · Recouvrer</strong><span>Où en sont les dossiers d'impayés ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/08-rejouer.jpg"><img src="../img/onglets/08-rejouer.jpg" alt="08 Rejouer : S/P glissant 12 mois rejoué mois par mois" loading="lazy"></a><figcaption><strong>08 · Rejouer</strong><span>Comment le ratio a-t-il dérivé mois après mois ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/09-cartographier.jpg"><img src="../img/onglets/09-cartographier.jpg" alt="09 Carte : carte des régions par indicateur et charge par garantie" loading="lazy"></a><figcaption><strong>09 · Carte</strong><span>Quels territoires et quels risques ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/10-fiabiliser.jpg"><img src="../img/onglets/10-fiabiliser.jpg" alt="10 Fiabiliser : huit contrôles sources vers Qlik, tous conformes" loading="lazy"></a><figcaption><strong>10 · Fiabiliser</strong><span>Les chiffres chargés sont-ils justes ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/11-evaluer.jpg"><img src="../img/onglets/11-evaluer.jpg" alt="11 Évaluer : cas d'usage IA, résultat à mesurer, preuve à produire" loading="lazy"></a><figcaption><strong>11 · Évaluer</strong><span>Quelle preuve exiger d'une solution IA ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/12-suivre.jpg"><img src="../img/onglets/12-suivre.jpg" alt="12 Suivre : chronologie d'un client fictif, du devis à la résiliation" loading="lazy"></a><figcaption><strong>12 · Suivre</strong><span>Quel parcours a suivi un client ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/13-anticiper.jpg"><img src="../img/onglets/13-anticiper.jpg" alt="13 Anticiper : projection du S/P en fourchette et plan d'action en 5 actions" loading="lazy"></a><figcaption><strong>13 · Anticiper</strong><span>Que voient venir les modèles et que lancer ?</span></figcaption></figure>
+      <figure class="ecran"><a href="../img/onglets/14-copiloter.jpg"><img src="../img/onglets/14-copiloter.jpg" alt="14 Copiloter : réponse du copilote avec outils et sources, KPI gouvernés" loading="lazy"></a><figcaption><strong>14 · Copiloter</strong><span>Que répond le copilote, et sur quelles sources ?</span></figcaption></figure>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <p>Démonstrateur VELORIAX ASSURANCE LABS · schémas générés avec Archify à partir de <a href="https://github.com/cnanaj-wq/veloriax-assurance-labs/tree/main/design/archify">spécifications versionnées</a>.</p>
+  <p>Données synthétiques · Qlik Sense, Python, serveur MCP, LLM local · Cédric NANA, consultant Data Analytics.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Des données synthétiques aux 15 onglets",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "sources",
+        "label": "Les 11 fichiers sources",
+        "focus": [
+          "gen_iard",
+          "gen_gli",
+          "gen_crm",
+          "csv"
+        ],
+        "note": "Trois générateurs Python écrivent les données fictives."
+      },
+      {
+        "id": "ia",
+        "label": "L'enrichissement IA",
+        "focus": [
+          "csv",
+          "ia",
+          "gouv",
+          "qlik"
+        ],
+        "note": "Les modèles lisent l'historique et écrivent 6 fichiers ia_*.csv, la gouvernance 2."
+      },
+      {
+        "id": "restitution",
+        "label": "Contrôle et restitution",
+        "focus": [
+          "qlik",
+          "ctrl",
+          "app",
+          "mcp"
+        ],
+        "note": "Le script recharge, 8 contrôles rapprochent, les onglets restituent."
+      }
+    ],
+    "viewBox": [
+      1068,
+      600
+    ]
+  },
+  "stages": [
+    {
+      "label": "Générer"
+    },
+    {
+      "label": "Fichiers sources"
+    },
+    {
+      "label": "Enrichir"
+    },
+    {
+      "label": "Charger et contrôler"
+    },
+    {
+      "label": "Restituer"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "gen_iard",
+      "type": "backend",
+      "label": "Générateurs IARD",
+      "sublabel": "contrats · sinistres",
+      "stage": 0,
+      "row": 0,
+      "tag": "Python"
+    },
+    {
+      "id": "gen_gli",
+      "type": "backend",
+      "label": "Générateur GLI",
+      "sublabel": "baux · échéances",
+      "stage": 0,
+      "row": 1,
+      "tag": "Python"
+    },
+    {
+      "id": "gen_crm",
+      "type": "backend",
+      "label": "Générateur CRM",
+      "sublabel": "1 200 clients",
+      "stage": 0,
+      "row": 2,
+      "tag": "Python"
+    },
+    {
+      "id": "csv",
+      "type": "database",
+      "label": "11 CSV sources",
+      "sublabel": "12 000 contrats",
+      "stage": 1,
+      "row": 1,
+      "tag": "synthétique"
+    },
+    {
+      "id": "ia",
+      "type": "cloud",
+      "label": "Modèles IA",
+      "sublabel": "scores · plan d'action",
+      "stage": 2,
+      "row": 0,
+      "tag": "6 CSV"
+    },
+    {
+      "id": "gouv",
+      "type": "security",
+      "label": "Gouvernance",
+      "sublabel": "KPI · fiches modèles",
+      "stage": 2,
+      "row": 2,
+      "tag": "2 CSV"
+    },
+    {
+      "id": "qlik",
+      "type": "backend",
+      "label": "Script Qlik",
+      "sublabel": "19 CSV rechargés",
+      "stage": 3,
+      "row": 1,
+      "tag": "DataFiles"
+    },
+    {
+      "id": "ctrl",
+      "type": "security",
+      "label": "Contrôles",
+      "sublabel": "8 sur 8 conformes",
+      "stage": 3,
+      "row": 2,
+      "tag": "onglet 10"
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "15 onglets",
+      "sublabel": "Qlik Cloud",
+      "stage": 4,
+      "row": 1,
+      "tag": "extension"
+    },
+    {
+      "id": "mcp",
+      "type": "external",
+      "label": "Claude via MCP",
+      "sublabel": "lecture seule",
+      "stage": 4,
+      "row": 2,
+      "tag": "OAuth"
+    }
+  ],
+  "flows": [
+    {
+      "from": "gen_iard",
+      "to": "csv",
+      "label": "mouvements",
+      "channelX": 244,
+      "route": "vertical-channel"
+    },
+    {
+      "from": "gen_gli",
+      "to": "csv",
+      "label": "GLI"
+    },
+    {
+      "from": "gen_crm",
+      "to": "csv",
+      "label": "événements",
+      "channelX": 244,
+      "route": "vertical-channel"
+    },
+    {
+      "from": "csv",
+      "to": "ia",
+      "label": "historique"
+    },
+    {
+      "from": "csv",
+      "to": "gouv",
+      "label": "définitions"
+    },
+    {
+      "from": "csv",
+      "to": "qlik",
+      "label": "11 CSV"
+    },
+    {
+      "from": "ia",
+      "to": "qlik",
+      "label": "ia_*.csv"
+    },
+    {
+      "from": "gouv",
+      "to": "qlik",
+      "label": "gouv_*.csv"
+    },
+    {
+      "from": "qlik",
+      "to": "ctrl",
+      "label": "rapprochement"
+    },
+    {
+      "from": "qlik",
+      "to": "app",
+      "label": "modèle associatif"
+    },
+    {
+      "from": "app",
+      "to": "mcp",
+      "label": "questions"
+    }
+  ]
+}

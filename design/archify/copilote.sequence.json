@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Une question au copilote (onglet 14)",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      620
+    ],
+    "views": [
+      {
+        "id": "routage",
+        "label": "Comprendre la question",
+        "focus": [
+          "decideur",
+          "onglet",
+          "pont",
+          "llm"
+        ],
+        "note": "Règles d'abord ; le LLM local ne classe que les questions libres."
+      },
+      {
+        "id": "faits",
+        "label": "Calculer les faits",
+        "focus": [
+          "pont",
+          "outils",
+          "docs"
+        ],
+        "note": "Question reconnue : les outils calculent. Sinon : recherche dans les documents approuvés."
+      },
+      {
+        "id": "reponse",
+        "label": "Répondre avec ses sources",
+        "focus": [
+          "pont",
+          "llm",
+          "onglet",
+          "decideur"
+        ],
+        "note": "Le LLM ne rédige que depuis des passages ; un chiffre non sourcé fait rejeter le texte."
+      }
+    ],
+    "column_fit": "spread"
+  },
+  "participants": [
+    {
+      "id": "decideur",
+      "type": "external",
+      "label": "Décideur",
+      "sublabel": "direction technique"
+    },
+    {
+      "id": "onglet",
+      "type": "frontend",
+      "label": "Onglet 14",
+      "sublabel": "extension Qlik"
+    },
+    {
+      "id": "pont",
+      "type": "backend",
+      "label": "Pont local",
+      "sublabel": "127.0.0.1:8787"
+    },
+    {
+      "id": "outils",
+      "type": "backend",
+      "label": "Outils MCP",
+      "sublabel": "lecture seule"
+    },
+    {
+      "id": "docs",
+      "type": "database",
+      "label": "Mini RAG",
+      "sublabel": "documents approuvés"
+    },
+    {
+      "id": "llm",
+      "type": "cloud",
+      "label": "LLM local",
+      "sublabel": "Ollama"
+    }
+  ],
+  "segments": [
+    {
+      "from": 160,
+      "to": 256,
+      "label": "Routage"
+    },
+    {
+      "from": 268,
+      "to": 392,
+      "label": "Faits"
+    },
+    {
+      "from": 404,
+      "to": 536,
+      "label": "Réponse"
+    }
+  ],
+  "messages": [
+    {
+      "id": "question",
+      "from": "decideur",
+      "to": "onglet",
+      "y": 176,
+      "label": "pose une question"
+    },
+    {
+      "id": "post",
+      "from": "onglet",
+      "to": "pont",
+      "y": 206,
+      "label": "POST /api/question",
+      "variant": "emphasis"
+    },
+    {
+      "id": "classer",
+      "from": "pont",
+      "to": "llm",
+      "y": 240,
+      "label": "classer si hors règles",
+      "variant": "dashed"
+    },
+    {
+      "id": "appel",
+      "from": "pont",
+      "to": "outils",
+      "y": 282,
+      "label": "kpi_portefeuille…",
+      "variant": "emphasis"
+    },
+    {
+      "id": "chiffres",
+      "from": "outils",
+      "to": "pont",
+      "y": 312,
+      "label": "faits chiffrés",
+      "variant": "return"
+    },
+    {
+      "id": "recherche",
+      "from": "pont",
+      "to": "docs",
+      "y": 350,
+      "label": "sinon : rechercher_documents"
+    },
+    {
+      "id": "passages",
+      "from": "docs",
+      "to": "pont",
+      "y": 380,
+      "label": "passages + sources",
+      "variant": "return"
+    },
+    {
+      "id": "rediger",
+      "from": "pont",
+      "to": "llm",
+      "y": 422,
+      "label": "rédiger depuis passages",
+      "variant": "security"
+    },
+    {
+      "id": "controle",
+      "from": "llm",
+      "to": "pont",
+      "y": 452,
+      "label": "gardé si chiffres sourcés",
+      "variant": "return"
+    },
+    {
+      "id": "reponse",
+      "from": "pont",
+      "to": "onglet",
+      "y": 490,
+      "label": "réponse, outils, sources",
+      "variant": "return"
+    },
+    {
+      "id": "decision",
+      "from": "onglet",
+      "to": "decideur",
+      "y": 520,
+      "label": "l'humain décide",
+      "variant": "return"
+    }
+  ]
+}
